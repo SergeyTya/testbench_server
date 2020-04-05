@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   <!-- <meta http-equiv="Refresh" content="1" /> -->
+    <title>Управление МПЧ</title>
+    <link rel="stylesheet" href="{{ static_url("style.css")}}">
+
+</head>
+<header>
+    <p>Испытательный стенд 5.5 кВт</p>
+</header>
+
+<body>
+<script type="text/javascript">
+        function OnHoldingPanelOpen (el, name){ // хэндлер выпадающего списка
+            // раскрытие панели
+            el.classList.toggle("active");
+            var panel = el.nextElementSibling;
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+            } else { panel.style.display = "block";};
+            // скрытие не назначенных пунктов
+            if(name == '') return;
+            rec = document.getElementsByClassName(name+"_values");
+            for (k=0; k < rec.length; k++) {
+                if(rec[k].value == "na") {
+                let tmp = name+"_record"+k;
+                document.getElementById(tmp).style.display = "none";}}
+        }
+</script>
+<div>
+    <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span></br>
+    <span>Статус:</span> <span ID="MPCH_Status"> - </span></br>
+    <span>Частота:</span> <span ID="MPCH_ireg0"> 0 </span><span> Гц </span></br>
+    <span>Ток:</span> <span ID="MPCH_ireg5"> 0 </span><span> А </span></br>
+    <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
+    <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
+    <span>Ошибок связи:</span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
+</div>
+<!--выпадающий список регистров хранения-->
+<button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>
+<div class="panel">
+        {% for i in range(len(input_names)) %}
+        <p id = {{"input_record"+str(i)}}>
+            <span class="names">{{ input_names[i][0] }}</span>
+            <input class=input_values name={{"MPCH_ireg"+str(i)}} type="text" value="na">
+            <button class="get_graf">График</button>
+        </p>
+        {% end %}
+</div>
+<!--выпадающий список регистров ввода-->
+<button class="accordion" onclick="OnHoldingPanelOpen(this,'holding')">Параметры</button>
+<div class="panel">
+<script type="text/javascript">
+        function OnSelectionChange (select) { // изменение input по выпадающему списку
+            var selectedOption = select.options[select.selectedIndex];
+            var inp = document.getElementsByName("MPCH_hreg"+select.name)
+            inp[0].value =  selectedOption.value
+        }
+</script>
+      {% for i in range(len(holding_names)) %}
+         <p id = {{"holding_record"+str(i)}}><span class="names">{{holding_names[i][0]}}</span>
+             <input class=holding_values name = {{"MPCH_hreg"+str(i)}} type="text" value="na" onchange="
+                this.style.background = 'red'
+                sendMessage(
+'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;{{i}}&quot;,&quot;VL&quot;:&quot;'+this.value+'&quot;}'
+                );
+             ">
+             <button class="get_hold" onclick="
+                sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_OneHolding&quot;,&quot;ADR&quot;:&quot;{{i}}&quot;}');
+                tmp = document.getElementsByName('{{"MPCH_hreg"+str(i)}}');
+                tmp[0].style.background = 'red'; ">Считать</button>
+             {% if len(holding_names[i]) > 1 %}
+                <select name = {{str(i)}} onchange="OnSelectionChange(this)">
+                {% for el in holding_names[i][1] %}
+                    <option value = {{el[1]}}>{{el[0]}}</option>
+                {% end %}
+                </select>
+             {% end %}
+        </p>
+      {% end %}
+<!-- кнопка загрузить из файла-->
+    <div>
+        <p>Загрузить параметры из файла</p>
+        <input type="file" class="custom-file-input" id="loadFromfile" onChange="
+            let files = document.getElementById('loadFromfile').files;
+            file=files.item(0);
+            console.log(file.name);
+            var reader = new FileReader();
+            reader.onload = function(event) {
+            var contents = event.target.result;
+            result = contents.split(/\r\n|\n/);
+            tmp = document.getElementsByClassName('holding_values');
+            for (i=0; i < tmp.length; i++) {
+                if(tmp[i].value == 'na') continue;
+                tmp[i].value = result[i+1];
+                tmp[i].style.background = 'red';
+                sendMessage(
+'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
+               );}};
+            reader.onerror = function(event) {
+                console.error('Файл не может быть прочитан! код ' + event.target.error.code);
+            };
+            reader.readAsText(file)
+        "></br></div>
+<!-- кнопка сохранить в файл   -->
+    <div>
+        <p>Сохранить параметры в файл</p>
+         <input type="file" class="custom-file-output" id="saveTofile" onChange="
+
+
+
+         ">
+<!-- <button onclick="sendMessage('{&quot;CMD&quot;:&quot;MPCH_saveToFile&quot;}')"> Сохранить в файл</button></br>    -->
+    </div>
+<!-- кнопка записать все параметры-->
+    <div>
+        <p>Записать все параметры в МПЧ</p>
+        <button onclick="
+         tmp = document.getElementsByClassName('holding_values');
+         for (i=0; i < tmp.length; i++) {
+              if(tmp[i].value == 'na') continue;
+              tmp[i].style.background = 'red';
+              sendMessage(
+'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
+               );}
+        "> Записать</button></br>
+    </div>
+<!-- кнопка считать все параметры-->
+    <div>
+        <p>Считать все параметры из МПЧ</p>
+        <button onclick="
+            sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_AllHoldings&quot;}');
+            tmp = document.getElementsByClassName('holding_values');
+            for (k=0; k < tmp.length; k++) tmp[k].style.background = 'red';
+                    "> Считать</button>
+    </div>
+</div>
+
+<button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление</button>
+<div class="panel">
+    <input type="range" /></br>
+    <button> Старт</button> <button> Стоп</button> <button> Сброс</button>
+ </div>
+
+
+
+<script src="{{static_url("scripts/index.js")}}"></script>
+
+
+</body>
+
+<footer>
+</footer>
+</html>
