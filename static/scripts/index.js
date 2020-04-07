@@ -11,11 +11,23 @@ function set_value_by_id(ID, value){
 }
 
 socket.onmessage = function (message) {
-    let dict = JSON.parse(message.data);
+
+        let dict
+    try {
+        dict = JSON.parse(message.data);
+    } catch (SyntaxError) {
+        console.log(message.data)
+        return
+    }
 
     for (key in  dict) {
         if(key=="MPCH_saveToFile") {
             window.open('\save_mprm');
+            continue
+        }
+
+        if(key=="MPCH_mes"){
+            console.log(dict[key].value)
             continue
         }
          var tmp = document.getElementById(key);
@@ -39,4 +51,8 @@ socket.onclose = function(){
 sendMessage = function(message) {
     console.log("sending: " + message);
     socket.send(message);
+};
+
+sendCommand = function(cmd, adr=0, value=0) {
+    sendMessage('{"CMD":"'+cmd+'", "ADR":"'+adr+'", "VL":"'+value+'"}')
 };

@@ -330,8 +330,8 @@ class Server(object):
             print("Found ", len(self.devices), " devices. ")
             return True
         raise self.ServerError(
-            "Current ports: \n" + "\n".join(ports) + "\nDevice Not found"
 
+            "Current ports: \n" + "\n".join(ports) + "\nDevice Not found"
         )
 
     def main(self, inpt):

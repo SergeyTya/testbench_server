@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
    <!-- <meta http-equiv="Refresh" content="1" /> -->
@@ -30,14 +30,36 @@
         }
 </script>
 <div>
-    <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span></br>
+
     <span>Статус:</span> <span ID="MPCH_Status"> - </span></br>
     <span>Частота:</span> <span ID="MPCH_ireg0"> 0 </span><span> Гц </span></br>
     <span>Ток:</span> <span ID="MPCH_ireg5"> 0 </span><span> А </span></br>
     <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
     <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
     <span>Ошибок связи:</span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
+    <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span>
+    <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+                 tmp = document.getElementById('MPCH_ID')
+                 tmp.innerHTML='обновление'
+                 sendCommand('MPCH_Get_SlaveID') "/>
+
 </div>
+
+<div>
+<p>Сбросить соединение с МПЧ</p>
+<button onclick="
+             tmp = document.getElementById('MPCH_ID')
+             tmp.innerHTML='обновление'
+             tmp = document.getElementById('MPCH_Status')
+             tmp.innerHTML='обновление'
+            sendMessage(
+'{&quot;CMD&quot;:&quot;MPCH_reconnect&quot;,&quot;ADR&quot;:&quot;0&quot;,&quot;VL&quot;:&quot;9600&quot;}'
+            );
+            sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_SlaveID&quot;}')
+            "> Сбросить </button>
+    </p>
+</div>
+
 <!--выпадающий список регистров хранения-->
 <button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>
 <div class="panel">
@@ -146,11 +168,9 @@
 
 
 
-<script src="{{static_url("scripts/index.js")}}"></script>
-
-
 </body>
 
 <footer>
+<script src='{{static_url("scripts/index.js")}}'></script>
 </footer>
 </html>
