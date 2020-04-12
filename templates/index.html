@@ -3,16 +3,34 @@
 <head>
     <meta charset="UTF-8">
    <!-- <meta http-equiv="Refresh" content="1" /> -->
+    <script src='{{static_url("scripts/plotly/plotly-latest.min.js")}}'></script>
+<!--    https://plotly.com/javascript/-->
     <title>Управление МПЧ</title>
     <link rel="stylesheet" href="{{ static_url("style.css")}}">
-
+    <p style="
+        color: #69808B;
+        text-align:center;
+        margin:10 auto;
+        font-size: 28px;
+        font-family: 'Open Sans', verdana, arial, sans-serif;
+        font-weight: bolder;
+    ">ИСПЫТАТЕЛЬНЫЙ СТЕНД 5.5 кВт</p>
 </head>
-<header>
-    <p>Испытательный стенд 5.5 кВт</p>
-</header>
 
-<body>
-<script type="text/javascript">
+<div style="display: none;">
+<!--    имена индикаторов-->
+        {% for i in range(len(input_names)) %}
+            <p id = {{"input_record"+str(i)}} class="menu_values">
+            <span class=names id={{'iname'+str(i)}}>{{ input_names[i][0] }}</span></p>
+        {% end %}
+</div>
+
+<body style="
+        background:  radial-gradient(ellipse, #36454D, #1A1A1A);
+        font-size: 18px;
+        color:white;
+        font-family: 'Open Sans', verdana, arial, sans-serif ">
+    <script type="text/javascript">
         function OnHoldingPanelOpen (el, name){ // хэндлер выпадающего списка
             // раскрытие панели
             el.classList.toggle("active");
@@ -22,155 +40,282 @@
             } else { panel.style.display = "block";};
             // скрытие не назначенных пунктов
             if(name == '') return;
-            rec = document.getElementsByClassName(name+"_values");
+            rec = document.getElementsByClassName(name);
             for (k=0; k < rec.length; k++) {
+                // disable unused element
                 if(rec[k].value == "na") {
-                let tmp = name+"_record"+k;
-                document.getElementById(tmp).style.display = "none";}}
+                    let tmp = "holding_record"+k;
+                    document.getElementById(tmp).style.display = "None";
+                }else{
+                     // switching listbox
+                     var ls = document.getElementsByName("HoldingListBox"+k)[0];
+                     if(ls != null) ls.value = rec[k].value;
+                }
+            }
         }
-</script>
-<div>
-
-    <span>Статус:</span> <span ID="MPCH_Status"> - </span></br>
-    <span>Частота:</span> <span ID="MPCH_ireg0"> 0 </span><span> Гц </span></br>
-    <span>Ток:</span> <span ID="MPCH_ireg5"> 0 </span><span> А </span></br>
-    <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
-    <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
-    <span>Ошибок связи:</span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
-    <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span>
-    <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+    </script>
+    <div style="
+        background-color:#272C2F;
+        color: #909091;
+        font-family:'Open Sans', verdana, arial, sans-serif">
+        <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span>
+        <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
                  tmp = document.getElementById('MPCH_ID')
                  tmp.innerHTML='обновление'
-                 sendCommand('MPCH_Get_SlaveID') "/>
+                 sendCommand('MPCH_reconnect')
+                 sendCommand('MPCH_Get_SlaveID') "/></br>
+        <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
+        <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
+        <span>Ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
+        <span>Всего клиентов: </span>  <span ID="ClientCount"> 0 <span> </span></span></br>
+    </div>
 
-</div>
-
-<div>
-<p>Сбросить соединение с МПЧ</p>
-<button onclick="
-             tmp = document.getElementById('MPCH_ID')
-             tmp.innerHTML='обновление'
-             tmp = document.getElementById('MPCH_Status')
-             tmp.innerHTML='обновление'
-            sendMessage(
-'{&quot;CMD&quot;:&quot;MPCH_reconnect&quot;,&quot;ADR&quot;:&quot;0&quot;,&quot;VL&quot;:&quot;9600&quot;}'
-            );
-            sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_SlaveID&quot;}')
-            "> Сбросить </button>
-    </p>
-</div>
-
-<!--выпадающий список регистров хранения-->
-<button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>
-<div class="panel">
-        {% for i in range(len(input_names)) %}
-        <p id = {{"input_record"+str(i)}}>
-            <span class="names">{{ input_names[i][0] }}</span>
-            <input class=input_values name={{"MPCH_ireg"+str(i)}} type="text" value="na">
-            <button class="get_graf">График</button>
-        </p>
-        {% end %}
-</div>
-<!--выпадающий список регистров ввода-->
-<button class="accordion" onclick="OnHoldingPanelOpen(this,'holding')">Параметры</button>
-<div class="panel">
-<script type="text/javascript">
-        function OnSelectionChange (select) { // изменение input по выпадающему списку
-            var selectedOption = select.options[select.selectedIndex];
-            var inp = document.getElementsByName("MPCH_hreg"+select.name)
-            inp[0].value =  selectedOption.value
-        }
-</script>
-      {% for i in range(len(holding_names)) %}
-         <p id = {{"holding_record"+str(i)}}><span class="names">{{holding_names[i][0]}}</span>
-             <input class=holding_values name = {{"MPCH_hreg"+str(i)}} type="text" value="na" onchange="
-                this.style.background = 'red'
-                sendMessage(
-'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;{{i}}&quot;,&quot;VL&quot;:&quot;'+this.value+'&quot;}'
-                );
-             ">
-             <button class="get_hold" onclick="
-                sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_OneHolding&quot;,&quot;ADR&quot;:&quot;{{i}}&quot;}');
-                tmp = document.getElementsByName('{{"MPCH_hreg"+str(i)}}');
-                tmp[0].style.background = 'red'; ">Считать</button>
-             {% if len(holding_names[i]) > 1 %}
-                <select name = {{str(i)}} onchange="OnSelectionChange(this)">
-                {% for el in holding_names[i][1] %}
-                    <option value = {{el[1]}}>{{el[0]}}</option>
+    <div>
+        <div ID="MPCH_Status" style="
+        text-align:center;
+        margin:10 auto;
+        font-size: 32px;
+        font-family: 'Open Sans', verdana, arial, sans-serif;
+        font-weight: bold;
+        background-color:#272C2F;
+        padding: 5px
+        "> нет соединения  </div>
+            <ul style="font-size: 10px; margin:10 auto">
+                {% for i in range(6) %}
+                <li id={{"plotlyIndi"+str(i)}} style=" display: inline-block;"></li>
                 {% end %}
-                </select>
-             {% end %}
-        </p>
-      {% end %}
-<!-- кнопка загрузить из файла-->
-    <div>
-        <p>Загрузить параметры из файла</p>
-        <input type="file" class="custom-file-input" id="loadFromfile" onChange="
-            let files = document.getElementById('loadFromfile').files;
-            file=files.item(0);
-            console.log(file.name);
-            var reader = new FileReader();
-            reader.onload = function(event) {
-            var contents = event.target.result;
-            result = contents.split(/\r\n|\n/);
-            tmp = document.getElementsByClassName('holding_values');
-            for (i=0; i < tmp.length; i++) {
-                if(tmp[i].value == 'na') continue;
-                tmp[i].value = result[i+1];
-                tmp[i].style.background = 'red';
-                sendMessage(
-'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
-               );}};
-            reader.onerror = function(event) {
-                console.error('Файл не может быть прочитан! код ' + event.target.error.code);
-            };
-            reader.readAsText(file)
-        "></br></div>
+            </ul>
+    </div>
+    <div> <!--блок выпадающих списков-->
+        <!--выпадающий список управление-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление МПЧ</button>
+        <div class="panel"> <!--выпадающий список управление-->
+   <table width="300" border="0" cellpadding="5" cellspacing="0" align="center">  <!--таблица с элементами управления-->
+     <tr>
+       <td width="120"  height="30"><!--кнопка пуск-->
+         <button class="RoundCB" style="background-color: #74BD79;"
+                onclick=" sendCommand('MPCH_Set_OneHolding',0, '1') "
+            >ПУСК</button>
+       </td>
+       <td  valign="top" rowspan="2">
+         <table border="0">
+           <tr><td height="10"><!-- заголовок-->
+             <span style="font-size: 18px; padding: 20px">Задание частоты:</span>
+           </td></tr>
+           <tr><td height="100" align = "center"><!--индикатор частоты-->
+             <input type="text" class = "FreqDigit" id="CFreqDigit" value="0.0" size = "2"
+                    step ="0.1"
+              onchange="
+                        var val = document.getElementsByName('MPCH_hreg5')[0].value;
+                        if(val==null) return;
+                        tmp = this.value*10;
+                        if(tmp > val){
+                            tmp=val;
+                            this.value=val/10;
+                        }
+                        sendCommand('MPCH_Set_OneHolding',3, tmp);
+                "
+             ><span class = "FreqDigit" style="width: 30px;">Гц</span>
+           </td></tr>
+           <tr><td height="40" > <!--ползунок частоты-->
+             <input type="range" aling="center" class="FreqRange" min="0" max="1000"
+                    value="0" step="1" id="CFreqRange"
+                onchange="
+                        var val = document.getElementsByName('MPCH_hreg5')[0].value;
+                        if(val==null) return;
+                        tmp = Number(val*this.value/1000);
+                        sendCommand('MPCH_Set_OneHolding',3, tmp.toFixed(0));
+                "
+                oninput="
+                        var val = document.getElementsByName('MPCH_hreg5')[0].value;
+                        if(val==null) return;
+                        tmp = document.getElementById('CFreqDigit');
+                        tmp.value =Number(val*this.value/1000).toFixed(0)/10;
+                "
+             >
+           </td></tr>
+         </table>
+       </td>
+       <td width="240"  height="30"  valign="top"><!--индикатор направления-->
+            <input type="text" class="RoundCB" value="Вперед" id="CDirIndi" style="background-color: #393E41;">
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><!--кнопка стоп сброс-->
+           <button class="RoundCB" style="background-color: #E45B59;"
+                   onclick=" sendCommand('MPCH_Set_OneHolding',0, '2'); sendCommand('MPCH_Set_OneHolding',0, '4');">
+         <table rules="rows" align="center">
+           <tr><td>СТОП</td></tr>
+           <tr><td>Сброс</td></tr>
+         </table>
+         </button>
+       </td>
+       <td width="240"  height="30" rowspan="1" valign="top" ><!--кнопка реверс-->
+       <button class="RoundCB" style="background-color: #6EB1C4;" onclick="
+                    var val = document.getElementsByName('MPCH_hreg4')[0].value;
+                    if(val==null) return;
+                    if(val == '0') sendCommand('MPCH_Set_OneHolding',4, 1);
+                    if(val == '1') sendCommand('MPCH_Set_OneHolding',4, 0);"
+       >Реверс</button>
+       </td>
+     </tr>
+  </table>
+        </div>
+
+<!--&lt;!&ndash;выпадающий список регистров хранения&ndash;&gt;-->
+<!--<button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>-->
+<!--<div class="panel">-->
+<!--        {% for i in range(len(input_names)) %}-->
+<!--        <p id = {{"input_record"+str(i)}} class="menu_values">-->
+<!--            <span class=names id={{'iname'+str(i)}}>{{ input_names[i][0] }}</span>-->
+<!--            <input class=input_values name={{"MPCH_ireg"+str(i)}} type="text" value="na">-->
+<!--        </p>-->
+<!--        {% end %}-->
+<!--</div>-->
+
+<!--выпадающий список регистров ввода-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Параметры МПЧ</button>
+        <div class="panel" style="overflow-y: scroll; height: 400px;"> <!--выпадающий список регистров ввода-->
+              <script type="text/javascript">
+                function OnSelectionChange (select) { // изменение input по выпадающему списку
+                    var selectedOption = select.options[select.selectedIndex];
+                    var inp = document.getElementsByName("MPCH_hreg"+select.name);
+                    inp[0].value =  selectedOption.value;
+                    inp[0].onchange();
+                }
+
+                function HoldingInputOnChange(item,index){
+                    item.style.background = 'red'
+                    sendCommand('MPCH_Set_OneHolding',index,item.value)
+                    var tmp = document.getElementsByName("HoldingListBox"+index)[0];
+                    if(tmp != null) tmp.value = item.value;
+                }
+            </script>
+
+            <table class="holding_table" rules="rows" border="1" bordercolor = "#1A1A1A" cellpadding="5">
+                {% for i in range(len(holding_names)) %}
+                <tr id = {{"holding_record"+str(i)}} class="holding_row">
+                    <td><span class="holding_name">{{holding_names[i][0]}}</span></td>
+                    <td><input type="text" class="holding_value"
+                           size = "5" name = {{"MPCH_hreg"+str(i)}} value="na"
+                           onchange=" HoldingInputOnChange(this,{{i}})" >
+                    </td>
+                    <td><input type="image" src={{static_url('img/refresh.png')}} height="15" onclick="
+                        sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_OneHolding&quot;,&quot;ADR&quot;:&quot;{{i}}&quot;}');
+                        tmp = document.getElementsByName('{{'MPCH_hreg'+str(i)}}');
+                        tmp[0].style.background = 'red'; ">
+                    </td>
+                    <td>
+                        {% if len(holding_names[i]) > 1 %}
+                        <select name = {{"HoldingListBox"+str(i)}} onchange="OnSelectionChange(this)"
+                                style="width: 250px; font-size: 18px"
+                        >
+                            {% for el in holding_names[i][1] %}
+                            <option value = {{el[1]}}>{{el[0]}} </option>
+                            {% end %}
+                         <option value="" selected disabled hidden > не выбран</option>
+                        </select>
+                        {% end %}
+                    </td>
+                </tr>
+                {% end %}
+            </table>
+            <!-- кнопка загрузить из файла-->
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Загрузить параметры из файла</button>
+            <div class = panel>
+                <p>Параметры в устройстве будут перезаписаны значениями из файла</p>
+                <input type="file" class="custom-file-input" id="loadFromfile" onChange="
+                    let files = document.getElementById('loadFromfile').files;
+                    file=files.item(0);
+                    console.log(file.name);
+                    var reader = new FileReader();
+                    reader.onload = function(event)
+                    {
+                        var contents = event.target.result;
+                        result = contents.split(/\r\n|\n/);
+                        tmp = document.getElementsByClassName('holding_value');
+                        for (i=0; i < tmp.length; i++)
+                        {
+                            if(tmp[i].value == 'na') continue;
+                            tmp[i].value = result[i+1];
+                            tmp[i].style.background = 'red';
+                            sendMessage(
+                            '{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
+                            );
+                        }
+                    };
+                    reader.onerror = function(event) {
+                        console.error('Файл не может быть прочитан! код ' + event.target.error.code);
+                    };
+                    reader.readAsText(file)
+                "></br>
+            </div>
 <!-- кнопка сохранить в файл   -->
-    <div>
-        <p>Сохранить параметры в файл</p>
-         <input type="file" class="custom-file-output" id="saveTofile" onChange="
-
-
-
-         ">
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сохранить параметры в файл</button>
+            <div class="panel">
+                <p>Параметры из таблицы будут сохранены в файл</p>
+                <input type="file" class="custom-file-output" id="saveTofile" onChange="<!--TODO-->">
 <!-- <button onclick="sendMessage('{&quot;CMD&quot;:&quot;MPCH_saveToFile&quot;}')"> Сохранить в файл</button></br>    -->
-    </div>
+            </div>
 <!-- кнопка записать все параметры-->
-    <div>
-        <p>Записать все параметры в МПЧ</p>
-        <button onclick="
-         tmp = document.getElementsByClassName('holding_values');
-         for (i=0; i < tmp.length; i++) {
-              if(tmp[i].value == 'na') continue;
-              tmp[i].style.background = 'red';
-              sendMessage(
-'{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
-               );}
-        "> Записать</button></br>
-    </div>
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Записать все параметры в МПЧ</button>
+            <div class="panel">
+                <p>Параметры в устройстве будут перезаписаны значениями из таблицы</p>
+                <button onclick="
+                    tmp = document.getElementsByClassName('holding_value');
+                    for (i=0; i < tmp.length; i++) {
+                    if(tmp[i].value == 'na') continue;
+                    tmp[i].style.background = 'red';
+                    sendMessage(
+                    '{&quot;CMD&quot;:&quot;MPCH_Set_OneHolding&quot;,&quot;ADR&quot;:&quot;'+i+'&quot;,&quot;VL&quot;:&quot;'+tmp[i].value+'&quot;}'
+                    );}
+                "> Записать</button></br>
+            </div>
 <!-- кнопка считать все параметры-->
-    <div>
-        <p>Считать все параметры из МПЧ</p>
-        <button onclick="
-            sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_AllHoldings&quot;}');
-            tmp = document.getElementsByClassName('holding_values');
-            for (k=0; k < tmp.length; k++) tmp[k].style.background = 'red';
-                    "> Считать</button>
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Считать все параметры из МПЧ</button>
+            <div class="panel">
+                <p>Параметры в таблице будут перезаписаны значениями из устройства</p>
+                <button onclick="
+                    sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_AllHoldings&quot;}');
+                    tmp = document.getElementsByClassName('holding_value');
+                    for (k=0; k < tmp.length; k++) tmp[k].style.background = 'red';
+                "> Считать</button>
+            </div>
+<!-- кнопка сохранить в МПЧ-->
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сохранить в память</button>
+            <div class="panel">
+                <p>Параметры в в устройстве будут сохранены в энергонезависимую память</p>
+                <button onclick="
+                    sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_AllHoldings&quot;}');
+                    tmp = document.getElementsByClassName('holding_value');
+                    for (k=0; k < tmp.length; k++) tmp[k].style.background = 'red';
+                    <!--            TODO-->
+                "> Сохранить</button>
+            </div>
+<!-- кнопка поумолчанию МПЧ-->
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сброс по умолчанию</button>
+            <div class="panel">
+                <p>Параметры в устройстве будут перезаписаны заводскими установками</p>
+                <button onclick="
+                    sendMessage('{&quot;CMD&quot;:&quot;MPCH_Get_AllHoldings&quot;}');
+                    tmp = document.getElementsByClassName('holding_value');
+                    for (k=0; k < tmp.length; k++) tmp[k].style.background = 'red';
+                <!--            TODO-->
+                "> Сохранить</button></br>
+            </div>
+        </div>
+<!--выпадающий список пустой-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление нагрузкой</button>
+        <div class="panel"> <!--выпадающий список управление-->
+        </div>
+<!--выпадающий список пустой-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Сценарии тестов</button>
+        <div class="panel"> <!--выпадающий список управление-->
+        </div>
     </div>
-</div>
-
-<button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление</button>
-<div class="panel">
-    <input type="range" /></br>
-    <button> Старт</button> <button> Стоп</button> <button> Сброс</button>
- </div>
-
-
-
 </body>
-
 <footer>
-<script src='{{static_url("scripts/index.js")}}'></script>
+<!--    <p>powered by SergeyTyagus</p>-->
+    <script src='{{static_url("scripts/index.js")}}'></script>
 </footer>
 </html>

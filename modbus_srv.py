@@ -57,7 +57,6 @@ class MPCH_Server(server.Server):
         ) as e: print(e)
 
     def createRegReq(self, name, ireg, adr, color=""):
-        # формирование json строки из массива регистров заданного типа
         if color == "":
             tmp_str = "{" + ','.join(list(map(
                 lambda nm, x, y: '"%s%d":{"value":"%d"} ' % (nm, y, x), name, ireg, adr
@@ -99,16 +98,18 @@ class MPCH_Server(server.Server):
 
     def getAllInputs(self, **kwargs):
         self.main(inpt="read 0 * 4")
-        self.devices[0].inputs[4] = math.sin(self.sincnt)*1000
+        self.devices[0].inputs[3] = math.sin(self.sincnt)*1000
+        self.devices[0].inputs[4] = 3670
+
         if len(self.devices[0].inputs) > 3:
             self.resultQ.put(self.createRegReq(
                 ["MPCH_ireg"]*len(self.devices[0].inputs),
                 self.devices[0].inputs[3:],
-                range(len(self.devices[0].inputs))
+                range(6)
             ))
 
     def getId(self, **kwargs):
-        tmp_id ='нет устройства'
+        tmp_id = "нет устройства"
         if len(self.devices) != 0:
             tmp_id= self.devices[0].slave_name
         tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % tmp_id

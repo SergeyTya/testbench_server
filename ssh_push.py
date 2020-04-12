@@ -56,8 +56,11 @@ if __name__ == '__main__':
     transport.connect(username=user, password=secret)
     sftp = paramiko.SFTPClient.from_transport(transport)
     for el in remote_dirs:
+        if ".git" in el: continue
+        print("Make dir: ", el)
         sftp.mkdir(el)
     for i in range(len(local_files)):
+        if ".git" in local_files[i]: continue
         print(local_files[i])
         sftp.put(local_files[i], remote_files[i])
     sftp.close()

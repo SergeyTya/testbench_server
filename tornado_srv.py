@@ -25,7 +25,9 @@ class app(tornado.web.Application):
         handlers = [
             (r"/", self.MainHandler),
             (r"/save_mprm", self.SaveMpchParamHandler),
-            (r"/ws", self.WebSocketHandler)
+            (r"/ws", self.WebSocketHandler),
+            (r"/statistics", self.StatHandler),
+            (r"/statistics2", self.StatHandler2)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -63,10 +65,20 @@ class app(tornado.web.Application):
         def get(self):
             self.render("save_mprm.html")
 
+    class StatHandler(tornado.web.RequestHandler):
+        def get(self):
+            self.render("stati.html")
+
+    class StatHandler2(tornado.web.RequestHandler):
+        def get(self):
+            self.render("stati2.html")
+
     class WebSocketHandler(tornado.websocket.WebSocketHandler):
         def open(self):
             tmp = '{"CMD":"%s"}'
             print("new connection", id(self))
+            print("new connection", self)
+
             app.clients.append(self)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_AllHoldings)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_SlaveID)
