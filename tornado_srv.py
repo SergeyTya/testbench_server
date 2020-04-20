@@ -20,6 +20,7 @@ class app(tornado.web.Application):
     holding_names = []
     taskQ = multiprocessing.Queue()
     resultQ = multiprocessing.Queue()
+    logfile = ""
 
     def __init__(self):
         handlers = [
@@ -67,7 +68,11 @@ class app(tornado.web.Application):
 
     class StatHandler(tornado.web.RequestHandler):
         def get(self):
-            self.render("stati.html")
+            self.render(
+                "stati.html",
+                logfile=app.logfile,
+                input_names=app.input_names,
+            )
 
     class StatHandler2(tornado.web.RequestHandler):
         def get(self):
@@ -78,6 +83,7 @@ class app(tornado.web.Application):
             tmp = '{"CMD":"%s"}'
             print("new connection", id(self))
             print("new connection", self)
+            print("new connection", self.current_user)
 
             app.clients.append(self)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_AllHoldings)

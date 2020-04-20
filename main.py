@@ -21,6 +21,7 @@ if __name__ == "__main__":
 
 
     def modbus_listener():
+        tornado_srv.app.logfile = mbs.MPCH.logfile
         if not tornado_srv.app.resultQ.empty():
             result = tornado_srv.app.resultQ.get()
             # print("sent result", result)

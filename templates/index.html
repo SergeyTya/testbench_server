@@ -2,10 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-   <!-- <meta http-equiv="Refresh" content="1" /> -->
-    <script src='{{static_url("scripts/plotly/plotly-latest.min.js")}}'></script>
-<!--    https://plotly.com/javascript/-->
-    <title>Управление МПЧ</title>
+    <title>Стенд 5.5 кВт</title>
     <link rel="stylesheet" href="{{ static_url("style.css")}}">
     <p style="
         color: #69808B;
@@ -26,7 +23,8 @@
 </div>
 
 <body style="
-        background:  radial-gradient(ellipse, #36454D, #1A1A1A);
+       // background:  radial-gradient(ellipse, #36454D, #1A1A1A);
+        background: #1A1A1A;
         font-size: 18px;
         color:white;
         font-family: 'Open Sans', verdana, arial, sans-serif ">
@@ -80,9 +78,15 @@
         background-color:#272C2F;
         padding: 5px
         "> нет соединения  </div>
+<!--    Цифровые индикаторы        -->
             <ul style="font-size: 10px; margin:10 auto">
                 {% for i in range(6) %}
-                <li id={{"plotlyIndi"+str(i)}} style=" display: inline-block;"></li>
+               <table style=" display: inline-block; background: #272C2F;">
+                    <tr align = "center"><td class="idndi_label">{{ input_names[i][0] }}</td></tr>
+                    <tr><td id={{"plotlyIndi"+str(i)}} class="idndi_digit" style="cursor: pointer;"
+                        onclick="window.open('/statistics');"
+                    >0.0</td></tr>
+                </table>
                 {% end %}
             </ul>
     </div>
@@ -254,7 +258,9 @@
             <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сохранить параметры в файл</button>
             <div class="panel">
                 <p>Параметры из таблицы будут сохранены в файл</p>
-                <input type="file" class="custom-file-output" id="saveTofile" onChange="<!--TODO-->">
+                <input type="file" class="custom-file-output" id="saveTofile" onChange="
+                    <!--TODO-->
+                ">
 <!-- <button onclick="sendMessage('{&quot;CMD&quot;:&quot;MPCH_saveToFile&quot;}')"> Сохранить в файл</button></br>    -->
             </div>
 <!-- кнопка записать все параметры-->

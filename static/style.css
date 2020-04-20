@@ -97,3 +97,22 @@ font-family: 'Open Sans', verdana, arial, sans-serif;
   color:#F97405;
   background: #393E41;
 }
+
+.idndi_digit{
+  display: inline-block;
+  padding: 0px;
+  font-size: 60px;
+  width: 200px;
+  text-align: center;
+  border: 0;
+  color:#F97405;
+}
+
+.idndi_label{
+  display: inline-block;
+  padding: 0px;
+  font-size: 18px;
+  text-align: center;
+  border: 0;
+  color:#F4E623;
+}

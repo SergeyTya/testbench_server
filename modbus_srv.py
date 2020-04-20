@@ -1,4 +1,7 @@
+import datetime
 import json
+import os
+
 import math
 import multiprocessing
 import sys
@@ -8,6 +11,8 @@ from io import StringIO
 import minimalmodbus
 import time
 import server
+
+now = datetime.datetime.now()
 
 class RedirectedStdout:
     def __init__(self):
@@ -40,6 +45,7 @@ class MPCH_Server(server.Server):
     def __init__(self, resultQ):
 
         self.resultQ = resultQ
+        self.logfile = ""
         super().__init__()
         tmp = sys.stdout
         self.write_console(tmp)
@@ -98,15 +104,18 @@ class MPCH_Server(server.Server):
 
     def getAllInputs(self, **kwargs):
         self.main(inpt="read 0 * 4")
+        self.sincnt = self.sincnt + 0.1
         self.devices[0].inputs[3] = math.sin(self.sincnt)*1000
         self.devices[0].inputs[4] = 3670
 
         if len(self.devices[0].inputs) > 3:
-            self.resultQ.put(self.createRegReq(
-                ["MPCH_ireg"]*len(self.devices[0].inputs),
-                self.devices[0].inputs[3:],
-                range(6)
-            ))
+            tmp = self.createRegReq(["MPCH_ireg"]*len(self.devices[0].inputs),self.devices[0].inputs[3:], range(6))
+            self.resultQ.put(tmp)
+            # json_data = json.dumps(tmp)
+            self.logfile.write(tmp+'\n')
+            self.logfile.flush()
+            if os.path.getsize(self.logfile.name) > (1024 * 1024 * 2):
+                self.create_logfile()
 
     def getId(self, **kwargs):
         tmp_id = "нет устройства"
@@ -146,6 +155,14 @@ class MPCH_Server(server.Server):
         tmp_str = 'MPCH message: %s' % mes
         self.resultQ.put(tmp_str)
 
+    def create_logfile(self):
+        name = now.strftime("%d%m%Y%H%M") + "_" + self.devices[0].slave_name
+        try:
+            if self.logfile != "": self.logfile.close()
+        except FileNotFoundError:
+            pass
+        self.logfile = open('static/logs/' + name + '.json', 'w')
+
     def reconnect(self, adr=1, **kwargs):
         print("Connection reset")
         self.write_console("Connection reset")
@@ -163,18 +180,15 @@ class MPCH_Server(server.Server):
             with RedirectedStdout() as out:
                 self.main(inpt="connect * * %d" % adr)
                 tmp = str(out)
-                print(tmp)
                 self.write_console(tmp)
+            print(tmp)
+            self.create_logfile()
         except server.Server.ServerError as e:
             tmp = str(out)
             self.write_console(tmp)
             print(tmp)
             print(e)
             self.write_console("error "+str(e))
-
-
-
-
 
 class TestBench(multiprocessing.Process):
 
@@ -188,8 +202,11 @@ class TestBench(multiprocessing.Process):
         self.connection_error_count = 0
 
         try:
-            self.MPCH.main(inpt="connect COM8 9600 1")
-            self.MPCH.main(inpt="devices")
+            # self.MPCH.main(inpt="connect COM8 9600 1")
+            # self.MPCH.main(inpt="devices")
+            self.MPCH.reconnect()
+
+
         except server.Server.ServerError as e:
             print(e)
             self.MPCH.write_console(e)
@@ -224,13 +241,8 @@ class TestBench(multiprocessing.Process):
             #     self.write_console("Unexpected error")
             #     self.MPCH.devices = []
 
-
-
     def proc(self):
-        time.sleep(0.1)
-
-
-
+        time.sleep(0.5)
 
         self.MPCH.getStatus()
         if len(self.MPCH.devices) == 0:
@@ -250,7 +262,6 @@ class TestBench(multiprocessing.Process):
             return
 
         self.MPCH.getAllInputs()
-        self.MPCH.sincnt = self.MPCH.sincnt + 0.1
         self.cnt = self.cnt + 1
         time.sleep(0.1)
         self.cnt = self.cnt + 1

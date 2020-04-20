@@ -1,36 +1,6 @@
 
 var socket = new WebSocket("ws://localhost:8080/ws");
 
-for (i=0; i <6; i++) {
-    name = document.getElementById('iname'+i).innerHTML
-    var graphDiv =  Plotly.newPlot(
-        'plotlyIndi'+i,
-        data = [{
-            domain: { x: [0, 1], y: [0, 1] },
-            value: 0.0,
-            valueformat: "0.0f",
-            title: {
-                font: {size:18, color: '#F4E623'},
-                text: name,
-                opacity: 1
-                },
-            type: "indicator",
-            mode: "number",
-            gauge: { axis: { range: [null, 1000] } },
-            delta: { reference: 0, valueformat: '.0f' },
-            number: {valueformat: '0.1f'}
-        }],
-        layout = {
-            font:{color:"#F97405"},
-            paper_bgcolor: "#272C2F",
-            autosize: "true",
-            width: 240,
-            height: 120,
-            margin: {l:0,r:0,t:35,b:0,pad:0}
-        }
-    );
-}
-
 socket.onopen = function(){
     console.log("connected");
 };
@@ -81,7 +51,7 @@ socket.onmessage = function (message) {
          }
 
          if(key.slice(0,9) == "MPCH_ireg"){
-             Plotly.update("plotlyIndi"+key.slice(9,10), {value : Number(dict[key].value)/10}, {});
+            set_value_by_id("plotlyIndi"+key.slice(9,10), Number(dict[key].value)/10)
           }
 
          if(key == "MPCH_hreg4"){
