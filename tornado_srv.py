@@ -20,7 +20,8 @@ class app(tornado.web.Application):
     holding_names = []
     taskQ = multiprocessing.Queue()
     resultQ = multiprocessing.Queue()
-    logfile = ""
+    logfileIndic = ""
+    logfileCmd = ""
 
     def __init__(self):
         handlers = [
@@ -37,11 +38,11 @@ class app(tornado.web.Application):
         )
         try:
             # Читаем имена индкаторов
-            with open('INDI.json', 'r',
+            with open('indi.json', 'r',
                       encoding='utf8'
                       ) as fh:
                 app.input_names = json.load(fh)
-            with open('PRM.json', 'r',
+            with open('prm.json', 'r',
                       encoding='Windows-1251'
                       ) as fh:
                 app.holding_names = json.load(fh)
@@ -70,13 +71,16 @@ class app(tornado.web.Application):
         def get(self):
             self.render(
                 "stati.html",
-                logfile=app.logfile,
+                logfile=app.logfileIndic,
                 input_names=app.input_names,
             )
 
     class StatHandler2(tornado.web.RequestHandler):
         def get(self):
-            self.render("stati2.html")
+            self.render(
+                "stati2.html",
+                logfile=app.logfileCmd,
+            )
 
     class WebSocketHandler(tornado.websocket.WebSocketHandler):
         def open(self):
