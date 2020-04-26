@@ -12,7 +12,7 @@ import minimalmodbus
 import time
 import server
 
-now = datetime.datetime.now()
+
 
 class RedirectedStdout:
     def __init__(self):
@@ -43,11 +43,10 @@ class Commands(object):
 class MPCH_Server(server.Server):
 
     def __init__(self, resultQ):
-
+        super().__init__()
         self.resultQ = resultQ
         self.logfileIndic = ""
         self.logfileCmd = ""
-        super().__init__()
         tmp = sys.stdout
         self.write_console(tmp)
         self.sincnt = 0
@@ -125,7 +124,7 @@ class MPCH_Server(server.Server):
 
     def writeCmdLog(self, msg):
         if self.logfileCmd != "":
-            self.logfileCmd.write(now.strftime("%d/%m/%Y-%H.%M.%S") + " : " + msg + '\n')
+            self.logfileCmd.write(datetime.datetime.now().strftime("%d/%m/%Y-%H.%M.%S") + " : " + msg + '\n')
             self.logfileCmd.flush()
 
     def getAllInputs(self, **kwargs):
@@ -136,6 +135,8 @@ class MPCH_Server(server.Server):
                 tmp = self.createRegReq(["MPCH_ireg"] * len(self.devices[0].inputs), self.devices[0].inputs[3:],
                                         range(6))
                 self.resultQ.put(tmp)
+                now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')
+                tmp = tmp[:1] + '"time":' + now + tmp[1:]
                 self.logfileIndic.write(tmp + '\n')
                 # self.logfile.flush()
                 if os.path.getsize(self.logfileIndic.name) > (1024 * 1024 * 2):
@@ -191,13 +192,13 @@ class MPCH_Server(server.Server):
         self.writeCmdLog(tmp_str)
 
     def create_logfile(self):
-        name1 = now.strftime("%d%m%Y%H%M") + "_" + self.devices[0].slave_name + "_indic.json"
-        name2 = now.strftime("%d%m%Y%H%M") + "_" + self.devices[0].slave_name + "_cmd.txt"
+        now = datetime.datetime.now()
+        name1 = now.strftime("%d%m%Y%H%M%S") + "_" + self.devices[0].slave_name + "_indic.json"
+        name2 = now.strftime("%d%m%Y%H%M%S") + "_" + self.devices[0].slave_name + "_cmd.txt"
         try:
             if self.logfileIndic != "": self.logfileIndic.close()
             if self.logfileCmd != "": self.logfileCmd.close()
-        except FileNotFoundError:
-            pass
+        except FileNotFoundError: pass
         self.logfileIndic = open('static/log/' + name1, 'x')
         self.logfileCmd = open('static/log/' + name2, 'x')
 
@@ -228,6 +229,7 @@ class MPCH_Server(server.Server):
             print(e)
             self.write_console("error "+str(e))
 
+
 class TestBench(multiprocessing.Process):
 
     cnt = 0
@@ -240,10 +242,9 @@ class TestBench(multiprocessing.Process):
         self.connection_error_count = 0
 
         try:
-            # self.MPCH.main(inpt="connect COM8 9600 1")
-            # self.MPCH.main(inpt="devices")
-            self.MPCH.reconnect()
 
+            # self.MPCH.main(inpt="devices")
+            self.MPCH.reconnect(adr=1)
 
         except server.Server.ServerError as e:
             print(e)

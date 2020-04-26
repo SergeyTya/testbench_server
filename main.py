@@ -8,6 +8,7 @@ import tornado.websocket
 import tornado.gen
 from tornado.options import define, options
 
+
 if __name__ == "__main__":
 
     mbs = modbus_srv.TestBench(tornado_srv.app.taskQ, tornado_srv.app.resultQ)

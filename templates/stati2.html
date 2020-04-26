@@ -3,45 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src='{{static_url("scripts/plotly/plotly-latest.min.js")}}'></script>
-<!--    https://plotly.com/javascript/-->
 </head>
 <body>
 
-<div id="tester" style="width:600px;height:250px;"></div>
-
-<script>
-	TESTER = document.getElementById('tester');
-	Plotly.newPlot( TESTER, [{
-	x: [1, 2, 3, 4, 5],
-	y: [1, 2, 4, 8, 16] }], {
-	margin: { t: 0 } } );
-</script>
-
-<div id="myDiv" style="width:600px;height:250px;"></div>
-
-<script>
-
-function readTextFile(file, callback) {
-    var rawFile = new XMLHttpRequest();
-    rawFile.overrideMimeType("application/json");
-    rawFile.open("GET", file, true);
-    rawFile.onreadystatechange = function() {
-        if (rawFile.readyState === 4 && rawFile.status == "200") {
-            callback(rawFile.responseText);
-        }
-    }
-    rawFile.send(null);
-}
-
-readTextFile('{{static_url("data/cur_log.json")}}', function(text){
-    data = JSON.parse(text);
-    var layout = { width: 300, height: 200 };
-    Plotly.newPlot('myDiv', data, layout);
-});
-
-</script>
-
+    <div id="some_id">
+        <?php echo file_get_contents({{static_url('log/LOG.txt')}}) ?>
+    </div>
 
 </body>
 </html>

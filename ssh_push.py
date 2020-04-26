@@ -1,89 +1,67 @@
 import time
-
-import paramiko
 import os
 from pathlib import Path
+from shutil import make_archive
+import paramiko
 
-
-host = '192.168.1.196'
+host = '192.168.1.74'
 user = 'root'
 secret = 'Sergey128'
-port = 22
-local_files = []
-local_dirs = []
-
-
-def get_files(path):
-    for root, dirs, files in os.walk(path, topdown=True):
-        for name in files:
-            # if name.count("git") != 0: continue
-            tmp = str(next(Path(path).rglob(name)))
-            if tmp.count('.git') != 0: continue
-            tmp = tmp.replace("\\", "/")
-            local_files.append(tmp)
-            # print("file - ", tmp)
-
-    for root, dirs, files in os.walk(path, topdown=True):
-        for name in dirs:
-            # if ".git" in name: continue
-            tmp = str(next(Path(path).rglob(name)))
-            if tmp.count('git') != 0: continue
-            tmp = tmp.replace("\\", "/")
-            local_dirs.append(tmp)
-            # print("dir - ", tmp)
-
-
-
+remote_path = "/_srv/"
 
 if __name__ == '__main__':
 
-    local_path  = "D:/Sergey_work/_pyrepos/lab_srv/testbench_server/"
-    remote_path = "/_srv/"
-
-   #  local_path  = "D:/moxalinux/dst/"
-   #  remote_path = "/_drv/"
-
-    get_files(local_path)
-
-
-    ind = len(local_path)
-    remote_files = list(map(lambda x: remote_path + x[ind:], local_files))
-    remote_dirs = list(map(lambda x:  remote_path + x[ind:], local_dirs))
+    port = 22
+    local_file = Path("arch.zip").resolve()
+    remote_file = remote_path + "arch.zip"
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    ssh.connect(host, username=user, password=secret)
     print("connected to ", host, " as ", user)
+    ssh.connect(host, username=user, password=secret)
 
-    print("clear target path")
+    print("create local zip")
+    make_archive(
+        'arch',
+        'zip',  # the archive format - or tar, bztar, gztar
+        root_dir=None,  # root for archive - current working dir if None
+        base_dir=None)  # start archiving from here - cwd if None too
+
+    print("clear remote path")
     cmd = "rm -rf " + remote_path
     stdin, stdout, stderr = ssh.exec_command(cmd)
-    print("make dir ", remote_path)
-    cmd = "mkdir " + remote_path
-
-    stdin, stdout, stderr = ssh.exec_command(cmd)
-
     while not stdout.channel.exit_status_ready():
         time.sleep(1)
-    ssh.close()
 
-    print("copy files to target")
+    cmd = "mkdir " + remote_path
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    while not stdout.channel.exit_status_ready():
+        time.sleep(1)
+
+    print("copy zip to target")
     transport = paramiko.Transport((host, port))
     transport.connect(username=user, password=secret)
     sftp = paramiko.SFTPClient.from_transport(transport)
-    for el in remote_dirs:
-        if el.count('.git') != 0: continue
-        if el.count('.idea') != 0: continue
+    sftp.put(local_file, remote_file)
 
-        print("Make dir: ", el[0:])
-        sftp.mkdir(el[0:])
-    for i in range(len(local_files)):
-        if local_files[i].count('.git') != 0: continue
-        print(local_files[i])
-        sftp.put(local_files[i], remote_files[i])
-        time.sleep(0.1);
+    print("uzip on target")
+    cmd = "unzip "+remote_file + " -d " + remote_path + " -x arch.zip"
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    while not stdout.channel.exit_status_ready():
+        time.sleep(1)
+
+    try:
+        os.remove(local_file)
+        print("delete local zip")
+    except FileNotFoundError: pass
+
+    print("delete remote zip")
+    cmd = "rm " + remote_file
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    while not stdout.channel.exit_status_ready():
+        time.sleep(1)
+
+    ssh.close()
     sftp.close()
     transport.close()
-
 

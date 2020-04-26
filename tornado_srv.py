@@ -7,6 +7,8 @@ import tornado.ioloop
 import tornado.options
 import tornado.websocket
 import os.path
+
+from tornado import httputil
 from tornado.options import define, options
 import modbus_srv
 
@@ -54,13 +56,15 @@ class app(tornado.web.Application):
             print(e)
         tornado.web.Application.__init__(self, handlers, **settings)
 
+
     class MainHandler(tornado.web.RequestHandler):
         def get(self):
 
             self.render(
                 "index.html",
                 input_names=app.input_names,
-                holding_names=app.holding_names
+                holding_names=app.holding_names,
+                logfile=app.logfileCmd,
             )
 
     class SaveMpchParamHandler(tornado.web.RequestHandler):

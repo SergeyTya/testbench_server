@@ -65,19 +65,22 @@
         <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
         <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
         <span>Ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
-        <span>Всего клиентов: </span>  <span ID="ClientCount"> 0 <span> </span></span></br>
+<!--        <span>Всего клиентов: </span>  <span ID="ClientCount"> 0 <span> </span></span></br>-->
+        <a href = {{logfile.name}} target="_blank"> Посмотреть лог </a>
     </div>
-
+<!-- Статус -->
     <div>
-        <div ID="MPCH_Status" style="
-        text-align:center;
-        margin:10 auto;
-        font-size: 32px;
-        font-family: 'Open Sans', verdana, arial, sans-serif;
-        font-weight: bold;
-        background-color:#272C2F;
-        padding: 5px
-        "> нет соединения  </div>
+        <div ID="MPCH_Status"
+             style="
+                text-align:center;
+                margin:10 auto;
+                font-size: 32px;
+                font-family: 'Open Sans', verdana, arial, sans-serif;
+                font-weight: bold;
+                background-color:#272C2F;
+                padding: 5px;
+             "
+        >  нет соединения  </div>
 <!--    Цифровые индикаторы        -->
             <ul style="font-size: 10px; margin:10 auto">
                 {% for i in range(6) %}
@@ -96,33 +99,50 @@
         <div class="panel"> <!--выпадающий список управление-->
    <table width="300" border="0" cellpadding="5" cellspacing="0" align="center">  <!--таблица с элементами управления-->
      <tr>
-       <td width="120"  height="30"><!--кнопка пуск-->
-         <button class="RoundCB" style="background-color: #74BD79;"
-                onclick=" sendCommand('MPCH_Set_OneHolding',0, '1') "
-            >ПУСК</button>
-       </td>
+         <td width="120"  height="30"><!--кнопка пуск-->
+             <button class="RoundCB" style="background-color: #74BD79;"
+                onclick=" sendCommand('MPCH_Set_OneHolding',0, '1') ">ПУСК</button>
+         </td>
+         <td valign="top"><!--кнопка стоп сброс-->
+             <button class="RoundCB" style="background-color: #E45B59;"
+                   onclick=" sendCommand('MPCH_Set_OneHolding',0, '2'); sendCommand('MPCH_Set_OneHolding',0, '4');">
+                <table rules="rows" align="center">
+                    <tr><td>СТОП</td></tr>
+                    <tr><td>Сброс</td></tr>
+                </table>
+             </button>
+         </td>
+
        <td  valign="top" rowspan="2">
          <table border="0">
            <tr><td height="10"><!-- заголовок-->
              <span style="font-size: 18px; padding: 20px">Задание частоты:</span>
            </td></tr>
            <tr><td height="100" align = "center"><!--индикатор частоты-->
-             <input type="text" class = "FreqDigit" id="CFreqDigit" value="0.0" size = "2"
-                    step ="0.1"
-              onchange="
-                        var val = document.getElementsByName('MPCH_hreg5')[0].value;
-                        if(val==null) return;
-                        tmp = this.value*10;
-                        if(tmp > val){
-                            tmp=val;
-                            this.value=val/10;
-                        }
-                        sendCommand('MPCH_Set_OneHolding',3, tmp);
-                "
-             ><span class = "FreqDigit" style="width: 30px;">Гц</span>
+               <table>
+                   <tr>
+                       <td>
+                           <input type="Number" class = "FreqDigit" id="CFreqDigit" value="0.0" size = "2" step ="0.1"
+                                  onchange="
+                                var val = document.getElementsByName('MPCH_hreg5')[0].value;
+                                if(val==null) return;
+                                tmp = this.value*10;
+                                if(tmp > val){
+                                    tmp=val;
+                                    this.value=val/10;
+                                }
+                                sendCommand('MPCH_Set_OneHolding',3, tmp);
+                                "
+                           >
+                       </td>
+                       <td>
+                           <span class = "FreqDigit" style=" width: 80px;" >Гц</span>
+                       </td>
+                   </tr>
+               </table>
            </td></tr>
            <tr><td height="40" > <!--ползунок частоты-->
-             <input type="range" aling="center" class="FreqRange" min="0" max="1000"
+             <input type="range" aling="center" class="slider" min="0" max="1000"
                     value="0" step="1" id="CFreqRange"
                 onchange="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
@@ -140,28 +160,17 @@
            </td></tr>
          </table>
        </td>
-       <td width="240"  height="30"  valign="top"><!--индикатор направления-->
+        <td width="240"  height="30"  valign="top"><!--индикатор направления-->
             <input type="text" class="RoundCB" value="Вперед" id="CDirIndi" style="background-color: #393E41;">
-       </td>
-     </tr>
-     <tr>
-       <td valign="top"><!--кнопка стоп сброс-->
-           <button class="RoundCB" style="background-color: #E45B59;"
-                   onclick=" sendCommand('MPCH_Set_OneHolding',0, '2'); sendCommand('MPCH_Set_OneHolding',0, '4');">
-         <table rules="rows" align="center">
-           <tr><td>СТОП</td></tr>
-           <tr><td>Сброс</td></tr>
-         </table>
-         </button>
-       </td>
-       <td width="240"  height="30" rowspan="1" valign="top" ><!--кнопка реверс-->
-       <button class="RoundCB" style="background-color: #6EB1C4;" onclick="
+        </td>
+         <td width="240"  height="30" rowspan="1" ><!--кнопка реверс-->
+             <button class="RoundCB" style="background-color: #6EB1C4;" onclick="
                     var val = document.getElementsByName('MPCH_hreg4')[0].value;
                     if(val==null) return;
                     if(val == '0') sendCommand('MPCH_Set_OneHolding',4, 1);
                     if(val == '1') sendCommand('MPCH_Set_OneHolding',4, 0);"
-       >Реверс</button>
-       </td>
+             >Реверс</button>
+         </td>
      </tr>
   </table>
         </div>
@@ -182,10 +191,9 @@
         <div class="panel" style="overflow-y: scroll; height: 400px;"> <!--выпадающий список регистров ввода-->
               <script type="text/javascript">
                 function OnSelectionChange (select) { // изменение input по выпадающему списку
-                    var selectedOption = select.options[select.selectedIndex];
-                    var inp = document.getElementsByName("MPCH_hreg"+select.name);
-                    inp[0].value =  selectedOption.value;
-                    inp[0].onchange();
+                    var inp = document.getElementsByName('MPCH_hreg'+(select.name).substring(14))[0];
+                    inp.value =  select.options[select.selectedIndex].value;
+                    inp.onchange();
                 }
 
                 function HoldingInputOnChange(item,index){

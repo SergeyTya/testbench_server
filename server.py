@@ -246,6 +246,7 @@ class Server(object):
         master.serial.timeout = 0.50  # seconds
         master.debug = False
         master.close_port_after_each_call = False
+
         try:
             print("req id")
             req = master._perform_command(43, '\x0E\x01\x01\x00\x00')
