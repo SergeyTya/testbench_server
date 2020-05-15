@@ -116,7 +116,7 @@ function loadFile(filePath) {
         var layout = {
             title:name,
             xaxis: {
-              type: 'date',
+               type: 'date',
             },
             annotations: [],
         };
@@ -124,12 +124,11 @@ function loadFile(filePath) {
 
         try {
             samples.forEach(function(sample) {
-            const peaks = smoothed_z_score(sample, {lag: 10}, {threshold: 1} , {influence: 10})
-           // console.log(peaks.length + ": " + peaks.toString())
+            const peaks = smoothed_z_score(sample, {lag: 10}, {threshold: 0.1} , {influence: 5})
+            console.log(peaks.length + ": " + peaks.toString())
 
            for(j=0;j<peaks.length;j++){
                 if(peaks[j] != 0){
-
                     pos =j/peaks.length;
                         var result = {
                     xref: 'paper',
@@ -137,15 +136,17 @@ function loadFile(filePath) {
                     y: value[i][j],
                     xanchor: 'right',
                     yanchor: 'middle',
-                    text: 'peak' + value[i][j],
+                    text: value[i][j],
                     showarrow: false,
+                    ay: -100,
                     font: {
                         family: 'Arial',
                         size: 16,
                         color: 'black'
-                        }
+                        },
+                    visible: true,
                     };
-                    layout.annotations.push(result);
+                    if(value[i][j] >= value[i][j+1] && value[i][j] > value[i][j-1]) layout.annotations.push(result);
                   }
            }
                        })
@@ -154,6 +155,6 @@ function loadFile(filePath) {
             }
 
 
-        var graphDiv =  Plotly.newPlot('graf'+ i, data, layout);
+        var graphDiv =  Plotly.newPlot('graf'+ i, data, layout, {displaylogo: false});
 
     }

@@ -1,0 +1,130 @@
+14/05/2020-20.35.13 : {"MPCH_Status" : {"value" : " Готов Норма" , "color":"#6EB1C4"} }
+14/05/2020-20.35.24 : {"CMD":"MPCH_Get_AllHoldings"}
+14/05/2020-20.35.24 : {"MPCH_hreg0":{"value":"0" , "color" : "white"} ,"MPCH_hreg1":{"value":"0" , "color" : "white"} ,"MPCH_hreg2":{"value":"0" , "color" : "white"} ,"MPCH_hreg3":{"value":"0" , "color" : "white"} ,"MPCH_hreg4":{"value":"0" , "color" : "white"} ,"MPCH_hreg5":{"value":"0" , "color" : "white"} ,"MPCH_hreg6":{"value":"0" , "color" : "white"} ,"MPCH_hreg7":{"value":"0" , "color" : "white"} ,"MPCH_hreg8":{"value":"0" , "color" : "white"} ,"MPCH_hreg9":{"value":"0" , "color" : "white"} ,"MPCH_hreg10":{"value":"0" , "color" : "white"} ,"MPCH_hreg11":{"value":"0" , "color" : "white"} ,"MPCH_hreg12":{"value":"0" , "color" : "white"} ,"MPCH_hreg13":{"value":"0" , "color" : "white"} ,"MPCH_hreg14":{"value":"0" , "color" : "white"} ,"MPCH_hreg15":{"value":"0" , "color" : "white"} ,"MPCH_hreg16":{"value":"0" , "color" : "white"} ,"MPCH_hreg17":{"value":"0" , "color" : "white"} ,"MPCH_hreg18":{"value":"0" , "color" : "white"} ,"MPCH_hreg19":{"value":"0" , "color" : "white"} ,"MPCH_hreg20":{"value":"0" , "color" : "white"} ,"MPCH_hreg21":{"value":"0" , "color" : "white"} ,"MPCH_hreg22":{"value":"0" , "color" : "white"} ,"MPCH_hreg23":{"value":"0" , "color" : "white"} ,"MPCH_hreg24":{"value":"0" , "color" : "white"} ,"MPCH_hreg25":{"value":"0" , "color" : "white"} ,"MPCH_hreg26":{"value":"0" , "color" : "white"} ,"MPCH_hreg27":{"value":"0" , "color" : "white"} ,"MPCH_hreg28":{"value":"0" , "color" : "white"} ,"MPCH_hreg29":{"value":"0" , "color" : "white"} ,"MPCH_hreg30":{"value":"0" , "color" : "white"} ,"MPCH_hreg31":{"value":"0" , "color" : "white"} ,"MPCH_hreg32":{"value":"0" , "color" : "white"} ,"MPCH_hreg33":{"value":"0" , "color" : "white"} ,"MPCH_hreg34":{"value":"0" , "color" : "white"} ,"MPCH_hreg35":{"value":"0" , "color" : "white"} ,"MPCH_hreg36":{"value":"0" , "color" : "white"} ,"MPCH_hreg37":{"value":"0" , "color" : "white"} ,"MPCH_hreg38":{"value":"0" , "color" : "white"} ,"MPCH_hreg39":{"value":"0" , "color" : "white"} ,"MPCH_hreg40":{"value":"0" , "color" : "white"} ,"MPCH_hreg41":{"value":"0" , "color" : "white"} ,"MPCH_hreg42":{"value":"0" , "color" : "white"} ,"MPCH_hreg43":{"value":"0" , "color" : "white"} ,"MPCH_hreg44":{"value":"0" , "color" : "white"} }
+14/05/2020-20.35.24 : {"CMD":"MPCH_Get_SlaveID"}
+14/05/2020-20.35.24 : MPCH message: {"MPCH_ID" : {"value" : "AXISENS_________Ja20204"} }
+14/05/2020-20.35.24 : {"MPCH_ID" : {"value" : "AXISENS_________Ja20204"} }
+14/05/2020-20.35.24 : {"CMD":"MPCH_Get_Status"}
+14/05/2020-20.37.08 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-20.37.08 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-20.37.15 : {"CMD":"MPCH_Set_OneHolding", "ADR":"5", "VL":"100"}
+14/05/2020-20.37.15 : {"MPCH_hreg5":{"value":"100" , "color" : "white"} }
+14/05/2020-20.37.17 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"100"}
+14/05/2020-20.37.17 : {"MPCH_hreg3":{"value":"100" , "color" : "white"} }
+14/05/2020-20.37.20 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"1000"}
+14/05/2020-20.37.20 : {"MPCH_hreg3":{"value":"1000" , "color" : "white"} }
+14/05/2020-20.37.27 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"54"}
+14/05/2020-20.37.27 : {"MPCH_hreg3":{"value":"54" , "color" : "white"} }
+14/05/2020-20.37.29 : {"CMD":"MPCH_Set_OneHolding", "ADR":"0", "VL":"1"}
+14/05/2020-20.37.29 : {"MPCH_hreg0":{"value":"1" , "color" : "white"} }
+14/05/2020-20.37.31 : {"CMD":"MPCH_Set_OneHolding", "ADR":"4", "VL":"1"}
+14/05/2020-20.37.31 : {"MPCH_hreg4":{"value":"1" , "color" : "white"} }
+14/05/2020-20.37.33 : {"CMD":"MPCH_Set_OneHolding", "ADR":"4", "VL":"0"}
+14/05/2020-20.37.33 : {"MPCH_hreg4":{"value":"0" , "color" : "white"} }
+14/05/2020-20.38.23 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"100"}
+14/05/2020-20.38.23 : {"MPCH_hreg3":{"value":"100" , "color" : "white"} }
+14/05/2020-20.38.26 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"12"}
+14/05/2020-20.38.26 : {"MPCH_hreg3":{"value":"12" , "color" : "white"} }
+14/05/2020-20.38.26 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-20.38.26 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-20.41.57 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"100"}
+14/05/2020-20.41.57 : {"MPCH_hreg3":{"value":"100" , "color" : "white"} }
+14/05/2020-20.42.01 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-20.42.01 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-20.51.15 : {"CMD":"MPCH_Set_OneHolding", "ADR":"5", "VL":"500"}
+14/05/2020-20.51.15 : {"MPCH_hreg5":{"value":"500" , "color" : "white"} }
+14/05/2020-20.51.17 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.51.18 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.51.23 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"177"}
+14/05/2020-20.51.23 : {"MPCH_hreg3":{"value":"177" , "color" : "white"} }
+14/05/2020-20.51.28 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.51.28 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.54.49 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"68"}
+14/05/2020-20.54.49 : {"MPCH_hreg3":{"value":"68" , "color" : "white"} }
+14/05/2020-20.54.54 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"322"}
+14/05/2020-20.54.54 : {"MPCH_hreg3":{"value":"322" , "color" : "white"} }
+14/05/2020-20.54.57 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"27"}
+14/05/2020-20.54.57 : {"MPCH_hreg3":{"value":"27" , "color" : "white"} }
+14/05/2020-20.54.59 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"239"}
+14/05/2020-20.54.59 : {"MPCH_hreg3":{"value":"239" , "color" : "white"} }
+14/05/2020-20.54.59 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"405"}
+14/05/2020-20.54.59 : {"MPCH_hreg3":{"value":"405" , "color" : "white"} }
+14/05/2020-20.55.00 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"208"}
+14/05/2020-20.55.00 : {"MPCH_hreg3":{"value":"208" , "color" : "white"} }
+14/05/2020-20.55.01 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"20"}
+14/05/2020-20.55.01 : {"MPCH_hreg3":{"value":"20" , "color" : "white"} }
+14/05/2020-20.55.02 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"389"}
+14/05/2020-20.55.02 : {"MPCH_hreg3":{"value":"389" , "color" : "white"} }
+14/05/2020-20.55.02 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.55.02 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.55.54 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.55.54 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.55.55 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.55.55 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.55.56 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.55.56 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.55.56 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.56 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.55.56 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.56 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.55.57 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.57 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.55.57 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"498"}
+14/05/2020-20.55.57 : {"MPCH_hreg3":{"value":"498" , "color" : "white"} }
+14/05/2020-20.55.57 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.57 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.55.58 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.58 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.55.58 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"499"}
+14/05/2020-20.55.58 : {"MPCH_hreg3":{"value":"499" , "color" : "white"} }
+14/05/2020-20.56.00 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"480"}
+14/05/2020-20.56.00 : {"MPCH_hreg3":{"value":"480" , "color" : "white"} }
+14/05/2020-20.56.01 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"467"}
+14/05/2020-20.56.01 : {"MPCH_hreg3":{"value":"467" , "color" : "white"} }
+14/05/2020-20.56.04 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"429"}
+14/05/2020-20.56.04 : {"MPCH_hreg3":{"value":"429" , "color" : "white"} }
+14/05/2020-20.56.07 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"375"}
+14/05/2020-20.56.07 : {"MPCH_hreg3":{"value":"375" , "color" : "white"} }
+14/05/2020-20.56.09 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"339"}
+14/05/2020-20.56.09 : {"MPCH_hreg3":{"value":"339" , "color" : "white"} }
+14/05/2020-20.56.11 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"268"}
+14/05/2020-20.56.11 : {"MPCH_hreg3":{"value":"268" , "color" : "white"} }
+14/05/2020-20.56.14 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"165"}
+14/05/2020-20.56.14 : {"MPCH_hreg3":{"value":"165" , "color" : "white"} }
+14/05/2020-20.56.18 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-20.56.18 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-20.58.38 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-20.58.38 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-20.58.42 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-20.58.42 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-21.21.50 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"500"}
+14/05/2020-21.21.50 : {"MPCH_hreg3":{"value":"500" , "color" : "white"} }
+14/05/2020-21.21.54 : {"CMD":"MPCH_Set_OneHolding", "ADR":"3", "VL":"0"}
+14/05/2020-21.21.54 : {"MPCH_hreg3":{"value":"0" , "color" : "white"} }
+14/05/2020-22.04.56 : {"CMD":"MPCH_Get_AllHoldings"}
+14/05/2020-22.04.56 : {"MPCH_hreg0":{"value":"1" , "color" : "white"} ,"MPCH_hreg1":{"value":"0" , "color" : "white"} ,"MPCH_hreg2":{"value":"0" , "color" : "white"} ,"MPCH_hreg3":{"value":"0" , "color" : "white"} ,"MPCH_hreg4":{"value":"0" , "color" : "white"} ,"MPCH_hreg5":{"value":"500" , "color" : "white"} ,"MPCH_hreg6":{"value":"0" , "color" : "white"} ,"MPCH_hreg7":{"value":"0" , "color" : "white"} ,"MPCH_hreg8":{"value":"0" , "color" : "white"} ,"MPCH_hreg9":{"value":"0" , "color" : "white"} ,"MPCH_hreg10":{"value":"0" , "color" : "white"} ,"MPCH_hreg11":{"value":"0" , "color" : "white"} ,"MPCH_hreg12":{"value":"0" , "color" : "white"} ,"MPCH_hreg13":{"value":"0" , "color" : "white"} ,"MPCH_hreg14":{"value":"0" , "color" : "white"} ,"MPCH_hreg15":{"value":"0" , "color" : "white"} ,"MPCH_hreg16":{"value":"0" , "color" : "white"} ,"MPCH_hreg17":{"value":"0" , "color" : "white"} ,"MPCH_hreg18":{"value":"0" , "color" : "white"} ,"MPCH_hreg19":{"value":"0" , "color" : "white"} ,"MPCH_hreg20":{"value":"0" , "color" : "white"} ,"MPCH_hreg21":{"value":"0" , "color" : "white"} ,"MPCH_hreg22":{"value":"0" , "color" : "white"} ,"MPCH_hreg23":{"value":"0" , "color" : "white"} ,"MPCH_hreg24":{"value":"0" , "color" : "white"} ,"MPCH_hreg25":{"value":"0" , "color" : "white"} ,"MPCH_hreg26":{"value":"0" , "color" : "white"} ,"MPCH_hreg27":{"value":"0" , "color" : "white"} ,"MPCH_hreg28":{"value":"0" , "color" : "white"} ,"MPCH_hreg29":{"value":"0" , "color" : "white"} ,"MPCH_hreg30":{"value":"0" , "color" : "white"} ,"MPCH_hreg31":{"value":"0" , "color" : "white"} ,"MPCH_hreg32":{"value":"0" , "color" : "white"} ,"MPCH_hreg33":{"value":"0" , "color" : "white"} ,"MPCH_hreg34":{"value":"0" , "color" : "white"} ,"MPCH_hreg35":{"value":"0" , "color" : "white"} ,"MPCH_hreg36":{"value":"0" , "color" : "white"} ,"MPCH_hreg37":{"value":"0" , "color" : "white"} ,"MPCH_hreg38":{"value":"0" , "color" : "white"} ,"MPCH_hreg39":{"value":"0" , "color" : "white"} ,"MPCH_hreg40":{"value":"0" , "color" : "white"} ,"MPCH_hreg41":{"value":"0" , "color" : "white"} ,"MPCH_hreg42":{"value":"0" , "color" : "white"} ,"MPCH_hreg43":{"value":"0" , "color" : "white"} ,"MPCH_hreg44":{"value":"0" , "color" : "white"} }
+14/05/2020-22.04.56 : {"CMD":"MPCH_Get_SlaveID"}
+14/05/2020-22.04.56 : MPCH message: {"MPCH_ID" : {"value" : "AXISENS_________Ja20204"} }
+14/05/2020-22.04.56 : {"MPCH_ID" : {"value" : "AXISENS_________Ja20204"} }
+14/05/2020-22.04.56 : {"CMD":"MPCH_Get_Status"}
+14/05/2020-22.37.08 : {"MPCH_Status" : {"value" : "нет устройства" , "color":"gray"} }
+14/05/2020-22.37.08 : MPCH message: Device not found
+14/05/2020-22.37.09 : MPCH message: Device not found
+14/05/2020-22.37.11 : MPCH message: Device not found
+14/05/2020-22.37.12 : MPCH message: Device not found
+14/05/2020-22.37.14 : MPCH message: Device not found
+14/05/2020-22.37.15 : MPCH message: Device not found
+14/05/2020-22.37.17 : MPCH message: Device not found
+14/05/2020-22.37.18 : MPCH message: Device not found
+14/05/2020-22.37.20 : MPCH message: Device not found
+14/05/2020-22.37.21 : MPCH message: Device not found
+14/05/2020-22.37.23 : MPCH message: Device not found
+14/05/2020-22.37.24 : MPCH message: Device not found
+14/05/2020-22.37.26 : MPCH message: Device not found
+14/05/2020-22.37.27 : MPCH message: Device not found
+14/05/2020-22.37.29 : MPCH message: Device not found
+14/05/2020-22.37.30 : MPCH message: Device not found
+14/05/2020-22.37.32 : MPCH message: Device not found
+14/05/2020-22.37.33 : MPCH message: Device not found
+14/05/2020-22.37.35 : MPCH message: Device not found
+14/05/2020-22.37.36 : MPCH message: Device not found
