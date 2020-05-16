@@ -23,6 +23,9 @@ socket.onmessage = function (message) {
     }
 
     for (key in  dict) {
+
+        //console.log(dict[key])
+
         if(key=="MPCH_saveToFile") {
             window.open('\save_mprm');
             continue

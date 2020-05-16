@@ -1,34 +1,12 @@
-import datetime
 import json
-import os
-
-import math
 import multiprocessing
-import sys
 import termios
-from io import StringIO
-
 import minimalmodbus
+import serial
 import time
-import server
-
-
-
-class RedirectedStdout:
-    def __init__(self):
-        self._stdout = None
-        self._string_io = None
-
-    def __enter__(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._string_io = StringIO()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        sys.stdout = self._stdout
-
-    def __str__(self):
-        return self._string_io.getvalue()
+import serial as serialutil
+import mpch
+import schn
 
 
 class Commands(object):
@@ -40,224 +18,36 @@ class Commands(object):
     MPCH_saveToFile = "MPCH_saveToFile"
     MPCH_reconnect = "MPCH_reconnect"
 
-class MPCH_Server(server.Server):
-
-    def __init__(self, resultQ):
-        super().__init__()
-        self.resultQ = resultQ
-        self.logfileIndic = ""
-        self.logfileCmd = ""
-        tmp = sys.stdout
-        self.write_console(tmp)
-        self.sincnt = 0
-        self.connection_error_count = 0
-        self.dev_status = ""
-
-        try:
-            with open('status.json', 'r',
-                  encoding='Windows-1251'
-                     ) as fh:
-                self.satus_list = json.load(fh)
-        except (
-            json.decoder.JSONDecodeError,
-            FileNotFoundError,
-            UnicodeDecodeError
-        ) as e: print(e)
-
-    def createRegReq(self, name, ireg, adr, color=""):
-        if color == "":
-            tmp_str = "{" + ','.join(list(map(
-                lambda nm, x, y: '"%s%d":{"value":"%d"} ' % (nm, y, x), name, ireg, adr
-            ))) + "}"
-        else:
-            tmp_str = "{" + ','.join(list(map(
-                lambda nm, x, y, z: '"%s%d":{"value":"%d" , "color" : "%s"} ' % (nm, y, x, z), name, ireg, adr, color
-            ))) + "}"
-        return tmp_str
-
-    def getAllHoldings(self, **kwargs):
-        try:
-            self.main(inpt="read 0 * 3")
-
-            tmp = self.createRegReq(["MPCH_hreg"] * len(self.devices[0].holdings), self.devices[0].holdings,
-                                    range(len(self.devices[0].holdings)),["white"] * len(self.devices[0].holdings),)
-            self.resultQ.put(tmp)
-            self.writeCmdLog(tmp)
-
-        except (
-                minimalmodbus.InvalidResponseError,
-                minimalmodbus.ModbusException,
-                minimalmodbus.NoResponseError) as e:
-            self.connection_error_count = self.connection_error_count + 1
-            print(e)
-
-
-
-    def setOneHolding(self, adr, value, **kwargs):
-        try:
-            value = int(value)
-            adr = int(adr)
-        except ValueError: return
-        try:
-            self.main(inpt="write 0 %d %d" % (adr, value))
-            self.getOneHolding(adr)
-        except (
-                minimalmodbus.InvalidResponseError,
-                minimalmodbus.ModbusException,
-                minimalmodbus.NoResponseError) as e:
-            self.connection_error_count = self.connection_error_count + 1
-            print(e)
-
-
-    def getOneHolding(self, adr, **kwargs):
-        try:
-            num = int(adr)
-        except ValueError: return
-        self.main(inpt="read 0 %s 3" % adr)
-        tmp = self.createRegReq(
-            ["MPCH_hreg"],
-            [self.devices[0].holdings[num]],
-            [num],
-            ["white"])
-        self.resultQ.put(tmp)
-        self.writeCmdLog(tmp)
-
-    def writeCmdLog(self, msg):
-        if self.logfileCmd != "":
-            self.logfileCmd.write(datetime.datetime.now().strftime("%d/%m/%Y-%H.%M.%S") + " : " + msg + '\n')
-            self.logfileCmd.flush()
-
-    def getAllInputs(self, **kwargs):
-        try:
-            self.main(inpt="read 0 * 4")
-
-            if len(self.devices[0].inputs) > 3:
-                tmp = self.createRegReq(["MPCH_ireg"] * len(self.devices[0].inputs), self.devices[0].inputs[3:],
-                                        range(6))
-                self.resultQ.put(tmp)
-                now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')
-                tmp = tmp[:1] + '"time":' + now + tmp[1:]
-                self.logfileIndic.write(tmp + '\n')
-                # self.logfile.flush()
-                if os.path.getsize(self.logfileIndic.name) > (1024 * 1024 * 2):
-                    self.create_logfile()
-
-        except (
-                minimalmodbus.InvalidResponseError,
-                minimalmodbus.ModbusException,
-                minimalmodbus.NoResponseError) as e:
-            self.connection_error_count = self.connection_error_count + 1
-            print(e)
-
-    def getId(self, **kwargs):
-        tmp_id = "нет устройства"
-        if len(self.devices) != 0:
-            tmp_id= self.devices[0].slave_name
-        tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % tmp_id
-        self.resultQ.put(tmp_str)
-        self.write_console(tmp_str)
-        self.writeCmdLog(tmp_str)
-
-    def getStatus(self, **kwargs):
-        tmp_str = ""
-        if len(self.devices) > 0:
-            if len(self.devices[0].inputs) > 2:
-                str_status = str(hex(self.devices[0].inputs[2]))
-                try:
-                    str_status2 = " " + self.satus_list[0][str_status[2:3]][0]+" "+self.satus_list[1][str_status[3:5]]
-                    tmp_str = '{"MPCH_Status" : {"value" : "%s" , "color":"%s"} }' \
-                              % (str_status2, self.satus_list[0][str_status[2:3]][1])
-                except (
-                        KeyError,
-                        IndexError
-                ): str_status2 = str_status
-        else:
-            tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % " нет устройства "
-            self.resultQ.put(tmp_str)
-            tmp_str = '{"MPCH_Status" : {"value" : "%s" , "color":"%s"} }' \
-                      % ("нет устройства", "gray")
-        self.resultQ.put(tmp_str)
-        if self.dev_status != tmp_str:
-            self.dev_status = tmp_str
-            self.writeCmdLog(tmp_str)
-
-    def saveToFile(self, **kwargs):
-        #TODO save current holding to file
-        tmp_str = '{"MPCH_saveToFile" : {"value" : "DONE"} }'
-        self.resultQ.put(tmp_str)
-
-    def write_console(self, mes):
-        tmp_str = 'MPCH message: %s' % mes
-        self.resultQ.put(tmp_str)
-        self.writeCmdLog(tmp_str)
-
-    def create_logfile(self):
-        now = datetime.datetime.now()
-        name1 = now.strftime("%d%m%Y%H%M%S") + "_" + self.devices[0].slave_name + "_indic.json"
-        name2 = now.strftime("%d%m%Y%H%M%S") + "_" + self.devices[0].slave_name + "_cmd.txt"
-        try:
-            if self.logfileIndic != "": self.logfileIndic.close()
-            if self.logfileCmd != "": self.logfileCmd.close()
-        except FileNotFoundError: pass
-        self.logfileIndic = open('static/log/' + name1, 'x')
-        self.logfileCmd = open('static/log/' + name2, 'x')
-
-    def reconnect(self, adr=1, **kwargs):
-        print("Connection reset")
-        self.write_console("Connection reset")
-        try:
-            adr = int(adr)
-        except ValueError:
-            print('ValueError')
-            self.write_console("ValueError")
-            adr = 1
-        if adr == 0: adr = 1
-        self.devices = []
-        print("New connection Adr=%d" % adr)
-        self.write_console("New connection Adr=%d" % adr)
-        try:
-            with RedirectedStdout() as out:
-                self.main(inpt="connect * * %d" % adr)
-                tmp = str(out)
-                self.write_console(tmp)
-            print(tmp)
-            self.create_logfile()
-        except server.Server.ServerError as e:
-            tmp = str(out)
-            self.write_console(tmp)
-            print(tmp)
-            print(e)
-            self.write_console("error "+str(e))
-
 
 class TestBench(multiprocessing.Process):
-
-    cnt = 0
 
     def __init__(self, taskQ, resultQ):
         multiprocessing.Process.__init__(self)
         self.taskQ = taskQ
         self.resultQ = resultQ
-        self.MPCH = MPCH_Server(resultQ)
+
+        port = "/dev/ttyACM1"
+        serial_port = serialutil.Serial(port)
+        serial_port.baudrate = 9600
+        serial_port.bytesize = 8
+        serial_port.parity = serial.PARITY_NONE
+        serial_port.stopbits = 1
+        serial_port.timeout = 0.50  # seconds
+        self.MPCH = mpch.MPCH_Device(resultQ, serial_port)
+        self.Schn = schn.Schn_Device(resultQ, serial_port)
+        self.MPCH.refresh()
+        self.Schn.refresh()
+
         self.connection_error_count = 0
-
-        try:
-
-            # self.MPCH.main(inpt="devices")
-            self.MPCH.reconnect(adr=1)
-
-        except server.Server.ServerError as e:
-            print(e)
-            self.MPCH.write_console(e)
 
         self.command = {
             Commands.MPCH_Get_AllHoldings: self.MPCH.getAllHoldings,
-            Commands.MPCH_Get_SlaveID: self.MPCH.getId,
+            Commands.MPCH_Get_SlaveID: self.MPCH.refresh,
             Commands.MPCH_Get_Status: self.MPCH.getStatus,
             Commands.MPCH_Get_OneHolding: self.MPCH.getOneHolding,
             Commands.MPCH_Set_OneHolding: self.MPCH.setOneHolding,
             Commands.MPCH_saveToFile: self.MPCH.saveToFile,
-            Commands.MPCH_reconnect: self.MPCH.reconnect
+            Commands.MPCH_reconnect: self.MPCH.refresh
         }
 
     def write_console(self, mes):
@@ -267,51 +57,7 @@ class TestBench(multiprocessing.Process):
     def close(self):
         pass
 
-    def run(self):
-        while True:
-            try:
-                self.proc()
-            except termios.error as e:
-                print(e)
-                self.write_console("Port IO error")
-                self.MPCH.devices = []
-            # except:
-            #     print(" Thread unexpected error!! ")
-            #     self.write_console("Unexpected error")
-            #     self.MPCH.devices = []
-
-    def proc(self):
-        time.sleep(0.5)
-
-        self.MPCH.getStatus()
-        if len(self.MPCH.devices) == 0:
-            self.MPCH.write_console("Device not found")
-            while not self.taskQ.empty():
-                tmp = self.taskQ.get()
-                try:
-                    dict = json.loads(tmp)
-                except json.decoder.JSONDecodeError as e:
-                    self.MPCH.write_console("Command decode error")
-                    print(e)
-                    return
-                if dict["CMD"] == Commands.MPCH_reconnect:
-                    self.MPCH.reconnect(value=dict["VL"], adr=dict["ADR"])
-            time.sleep(1)
-            return
-
-        self.MPCH.getAllInputs()
-        self.cnt = self.cnt + 1
-        time.sleep(0.1)
-        self.cnt = self.cnt + 1
-        time.sleep(0.1)
-        tmp_str = '{"MPCH_ConCnt" : {"value" : "%d"} }' % self.cnt
-        self.resultQ.put(tmp_str)
-
-        if self.connection_error_count != self.MPCH.connection_error_count:
-            self.connection_error_count = self.MPCH.connection_error_count
-            tmp_str = '{"MPCH_ConErr" : {"value" : "%d"} }' % self.connection_error_count
-            self.resultQ.put(tmp_str)
-
+    def read_tasks(self):
         while not self.taskQ.empty():
             self.cnt = self.cnt + 1
             tmp = self.taskQ.get()
@@ -334,17 +80,43 @@ class TestBench(multiprocessing.Process):
 
             try:
                 self.command[dict["CMD"]](value=value, adr=adr)
-                self.write_console("done")
+                # self.write_console("done")
             except KeyError as e:
-                print('KeyError'+str(e))
-                self.write_console('KeyError'+str(e))
+                print('KeyError' + str(e))
+                self.write_console('KeyError' + str(e))
             except (
                     minimalmodbus.NoResponseError,
                     minimalmodbus.InvalidResponseError,
             ) as e:
                 print(e)
-                self.MPCH.connection_error_count = self.MPCH.connection_error_count+1
+                self.MPCH.connection_error_count = self.MPCH.connection_error_count + 1
 
+    def run(self):
+        while True:
+            try:
+                self.proc()
+            except termios.error as e:
+                print(e)
+                self.write_console("Port IO error")
+            # except:
+            #     print(" Thread unexpected error!! ")
+            #     self.write_console("Unexpected error")
+            #     self.MPCH.devices = []
+
+    def proc(self):
+        tmp_str = '{"MPCH_ConCnt" : {"value" : "%d"} }' % self.cnt
+        self.resultQ.put(tmp_str)
+        self.cnt = self.cnt + 1
+        time.sleep(0.5)
+        self.MPCH.getAllInputs()
+        self.MPCH.getStatus()
+
+        if self.connection_error_count != self.MPCH.connection_error_count:
+            self.connection_error_count = self.MPCH.connection_error_count
+            tmp_str = '{"MPCH_ConErr" : {"value" : "%d"} }' % self.connection_error_count
+            self.resultQ.put(tmp_str)
+
+        self.read_tasks()
 
 
 

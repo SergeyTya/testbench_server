@@ -26,7 +26,7 @@ if __name__ == "__main__":
         tornado_srv.app.logfileCmd = mbs.MPCH.logfileCmd
         if not tornado_srv.app.resultQ.empty():
             result = tornado_srv.app.resultQ.get()
-            # print("sent result", result)
+            #print("sent result", result)
             for c in tornado_srv.app.clients:
                 c.write_message(result)
 

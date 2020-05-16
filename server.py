@@ -236,16 +236,22 @@ class Server(object):
         :param -a: find all devices or stop at first
         :return: True if device found
         """
-        master = minimalmodbus.Instrument(port, sid)
-        master.serial.close()
-        master.serial = serialutil.Serial(port)
-        master.serial.baudrate = speed
-        master.serial.bytesize = 8
-        master.serial.parity = serial.PARITY_NONE
-        master.serial.stopbits = 1
-        master.serial.timeout = 0.50  # seconds
-        master.debug = False
-        master.close_port_after_each_call = False
+        master = None
+        for dev in self.devices:
+            if dev.device.serial.name == port:
+                master = dev.device
+
+        if master is None:
+            master = minimalmodbus.Instrument(port, sid)
+            master.serial.close()
+            master.serial = serialutil.Serial(port)
+            master.serial.baudrate = speed
+            master.serial.bytesize = 8
+            master.serial.parity = serial.PARITY_NONE
+            master.serial.stopbits = 1
+            master.serial.timeout = 0.50  # seconds
+            master.debug = False
+            master.close_port_after_each_call = False
 
         try:
             print("req id")
@@ -279,7 +285,7 @@ class Server(object):
         :param args: connect [Port Name] [Port Speed] [Device address] [-a]
         :return: True/False
         """
-        self.devices = []
+        temp_devcnt = len(self.devices)
         serials = serial.tools.list_ports.comports()
         ports = [el.device for el in serials]
         sids = range(1, 5)
@@ -305,12 +311,12 @@ class Server(object):
         self.brake_request = False
 
         for port in ports:
-            if (alloption is False) & (len(self.devices) != 0): break
+            if (alloption is False) & (len(self.devices) > temp_devcnt): break
             try:
                 for sid in sids:
-                    if (alloption is False) & (len(self.devices) != 0): break
+                    if (alloption is False) & (len(self.devices) > temp_devcnt): break
                     for speed in speeds:
-                        if (alloption is False) & (len(self.devices) != 0): break
+                        if (alloption is False) & (len(self.devices) > temp_devcnt): break
                         print("Searching:\n  Port =", port, "\n  Speed =", speed, "\n  Modbus ID =", sid)
                         try:
                             self.create_server(port, speed, sid)
@@ -327,7 +333,7 @@ class Server(object):
                 print(e)
                #self.devices[0].serial.close()
 
-        if len(self.devices) > 0:
+        if len(self.devices) > temp_devcnt:
             print("Found ", len(self.devices), " devices. ")
             return True
         raise self.ServerError(
@@ -344,17 +350,7 @@ class Server(object):
 
 if __name__ == '__main__':
     srv = Server()
-    srv.main(inpt="connect COM8 9600 1")
+    srv.main(inpt="connect ttyACM0 9600 1")
     srv.main(inpt="devices")
-    srv.devices[0].device.read_registers(
-        8,
-       2,
-        functioncode=3)
-   #  srv.main(inpt="read 0 * 3")
-   # # srv.main(inpt="read 1 * 4")
-   #  print(srv.devices[0].holdings)
-   #  srv.main(inpt="write 0 3 5")
-   #  #srv.main(inpt="read 0 0 3")
-   #  print(srv.devices[0].holdings)
 
 
