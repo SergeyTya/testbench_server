@@ -4,7 +4,8 @@ from pathlib import Path
 from shutil import make_archive
 import paramiko
 
-host = '192.168.1.74'
+# host = '192.168.1.74'
+host = '192.168.1.196'
 user = 'root'
 secret = 'Sergey128'
 remote_path = "/_srv/"
@@ -31,12 +32,12 @@ if __name__ == '__main__':
     cmd = "rm -rf " + remote_path
     stdin, stdout, stderr = ssh.exec_command(cmd)
     while not stdout.channel.exit_status_ready():
-        time.sleep(1)
+        time.sleep(0.5)
 
     cmd = "mkdir " + remote_path
     stdin, stdout, stderr = ssh.exec_command(cmd)
     while not stdout.channel.exit_status_ready():
-        time.sleep(1)
+        time.sleep(0.5)
 
     print("copy zip to target")
     transport = paramiko.Transport((host, port))
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     cmd = "unzip "+remote_file + " -d " + remote_path + " -x arch.zip"
     stdin, stdout, stderr = ssh.exec_command(cmd)
     while not stdout.channel.exit_status_ready():
-        time.sleep(1)
+        time.sleep(0.5)
 
     try:
         os.remove(local_file)
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     cmd = "rm " + remote_file
     stdin, stdout, stderr = ssh.exec_command(cmd)
     while not stdout.channel.exit_status_ready():
-        time.sleep(1)
+        time.sleep(0.5)
 
     ssh.close()
     sftp.close()

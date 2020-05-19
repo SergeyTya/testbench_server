@@ -1,6 +1,6 @@
 import json
 import multiprocessing
-import termios
+# import termios
 import minimalmodbus
 import serial
 import time
@@ -26,19 +26,24 @@ class TestBench(multiprocessing.Process):
         self.taskQ = taskQ
         self.resultQ = resultQ
 
-        port = "/dev/ttyACM1"
-        serial_port = serialutil.Serial(port)
-        serial_port.baudrate = 9600
-        serial_port.bytesize = 8
-        serial_port.parity = serial.PARITY_NONE
-        serial_port.stopbits = 1
-        serial_port.timeout = 0.50  # seconds
-        self.MPCH = mpch.MPCH_Device(resultQ, serial_port)
-        self.Schn = schn.Schn_Device(resultQ, serial_port)
+        # port = "/dev/ttyUSB0"
+        port = "COM6"
+        instrument = minimalmodbus.Instrument(port, 2)
+        instrument.serial.baudrate = 9600
+        instrument.serial.bytesize = 8
+        instrument.serial.parity = serial.PARITY_NONE
+        instrument.serial.stopbits = 1
+        instrument.serial.timeout = 0.50  # seconds
+        instrument.debug = False
+        instrument.close_port_after_each_call = False
+
+        self.MPCH = mpch.MPCH_Device(resultQ, instrument)
+        self.Schn = schn.Schn_Device(resultQ, instrument)
         self.MPCH.refresh()
         self.Schn.refresh()
 
         self.connection_error_count = 0
+        self.cnt = 0
 
         self.command = {
             Commands.MPCH_Get_AllHoldings: self.MPCH.getAllHoldings,

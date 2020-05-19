@@ -8,12 +8,8 @@ import serial
 
 class MPCH_Device(object):
 
-    def __init__(self, resultQ , serial_port : serial.Serial):
-
-        self.instrument: minimalmodbus.Instrument = minimalmodbus.Instrument(serial_port.port, 1)
-        self.instrument.serial = serial_port
-        self.instrument.debug = False
-        self.instrument.close_port_after_each_call = False
+    def __init__(self, resultQ , instrument):
+        self.instrument: minimalmodbus.Instrument = instrument
         self.resultQ = resultQ
         self.logfileIndic = ""
         self.logfileCmd = ""
@@ -23,6 +19,7 @@ class MPCH_Device(object):
         self.inputs = []
         self.slave_name = ""
         self.create_logfile()
+        self.adr = 1
 
         try:
             with open('status.json', 'r',
@@ -47,6 +44,7 @@ class MPCH_Device(object):
         return tmp_str
 
     def getAllHoldings(self, **kwargs):
+        self.instrument.address = self.adr
 
         if len(self.inputs) < 3: return
         try:
@@ -63,6 +61,7 @@ class MPCH_Device(object):
             print(e)
 
     def setOneHolding(self, adr, value, **kwargs):
+        self.instrument.address = self.adr
         try:
             value = int(value)
             adr = int(adr)
@@ -82,6 +81,7 @@ class MPCH_Device(object):
 
 
     def getOneHolding(self, adr, **kwargs):
+        self.instrument.address = self.adr
         try:
             num = int(adr)
         except ValueError: return
@@ -98,6 +98,7 @@ class MPCH_Device(object):
         self.writeCmdLog(tmp)
 
     def getAllInputs(self, **kwargs):
+        self.instrument.address = self.adr
         try:
             if len(self.inputs) < 3: return
             self.inputs = self.instrument.read_registers(0, self.inputs[0], functioncode=4)
@@ -118,6 +119,7 @@ class MPCH_Device(object):
             print(e)
 
     def refresh(self, **kwargs):
+        self.instrument.address = self.adr
         print("Refreshing MPCH device")
         self.slave_name = "нет устройства"
         self.connection_error_count = 0
@@ -205,22 +207,22 @@ class MPCH_Device(object):
 
 if __name__ == '__main__':
 
+    port = "/dev/ttyUSB0"
+    # port = "COM6"
+    instrument = minimalmodbus.Instrument(port, 2)
+    instrument.serial.baudrate = 9600
+    instrument.serial.bytesize = 8
+    instrument.serial.parity = serial.PARITY_NONE
+    instrument.serial.stopbits = 1
+    instrument.serial.timeout = 0.50  # seconds
+    instrument.debug = False
+    instrument.close_port_after_each_call = False
     resultQ = multiprocessing.Queue()
-    port = "/dev/ttyACM0"
-    master = minimalmodbus.Instrument(port, 1)
-    master.serial.baudrate = 9600
-    master.serial.bytesize = 8
-    master.serial.parity = serial.PARITY_NONE
-    master.serial.stopbits = 1
-    master.serial.timeout = 0.50  # seconds
-    master.debug = False
-    master.close_port_after_each_call = False
 
-    MPCH = MPCH_Device(resultQ, master)
+    MPCH = MPCH_Device(resultQ, instrument)
     MPCH.refresh()
     MPCH.getAllInputs()
     MPCH.getAllHoldings()
     MPCH.setOneHolding(2, 25)
     print(MPCH.holdings)
-
     print(MPCH.dev_status)
