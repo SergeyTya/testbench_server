@@ -318,9 +318,81 @@
                 "> Сохранить</button></br>
             </div>
         </div>
-<!--выпадающий список пустой-->
+<!--выпадающий список управление нагрузкой-->
         <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление нагрузкой</button>
-        <div class="panel"> <!--выпадающий список управление-->
+        <div class="panel">
+            <div style="
+                    margin: 5px;
+                    background-color:#272C2F;
+                    color: #909091;
+                    font-family:'Open Sans', verdana, arial, sans-serif">
+                <span>ID устройства:</span> <span ID="Schn_ID">нет устройства</span>
+                <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+                     tmp = document.getElementById('Schn_ID')
+                     tmp.innerHTML='обновление'
+                     sendCommand('Schn_reconnect')
+                     sendCommand('Schn_getID') "/></br>
+                <span>Статус:</span> <span ID="Schn_St">нет устройства</span></br>
+            </div>
+
+            <table style=" background: #272C2F;" align="center">
+                <tr > <!--    Цифровые индикаторы        -->
+                    <td colspan = "2">
+                        <table style=" display: inline-block; background: #272C2F;">
+                            <tr align = "center"><td class="idndi_label">Скорость, об/мин</td></tr>
+                            <tr><td id="SchnI0" class="idndi_digit">0.0</td></tr>
+                        </table>
+                        <table style=" display: inline-block; background: #272C2F;">
+                            <tr align = "center"><td class="idndi_label">Ток, А</td></tr>
+                            <tr><td id="SchnI1" class="idndi_digit">0.0</td></tr>
+                        </table>
+                        <table style=" display: inline-block; background: #272C2F;">
+                            <tr align = "center"><td class="idndi_label">Момент, %</td></tr>
+                            <tr><td id="SchnI2" class="idndi_digit">0.0</td></tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr valign="top"> <!--    Кнопки управления        -->
+                    <td align="center" colspan = "2">
+                        <button class="RoundCB" style="background-color: #74BD79;" onclick=" sendCommand('Schn_start');" >ПУСК</button>
+                        <button class="RoundCB" style="background-color: #E45B59;" onclick=" sendCommand('Schn_stop'); sendCommand('Schn_reset');">
+                            <table rules="rows" align="center">
+                                <tr><td>СТОП</td></tr>
+                                <tr><td>Сброс</td></tr>
+                             </table>
+                        </button>
+                        <button class="RoundCB" style="background-color: #6EB1C4;">Реверс</button>
+                    </td>
+                </tr>
+                <!--    Регуляторы        -->
+                <!--    Регулятор момента в ген. режиме       -->
+                <tr><td><p style = "font-size: 18px;" >Момент в генераторном режиме, %</p></td></tr>
+                <tr>
+                    <td><input type="range" aling="center" class="slider" min="0" max="100"  value="0" step="1" id = Schn_GenTrqRng
+                               onchange="sendCommand('Schn_setGenTorq', 0, this.value); set_value_by_id('SchnI4', this.value, 'red');"
+                               oninput=" set_value_by_id('SchnI4', this.value, 'blue'); "
+                    ></td>
+                    <td id="SchnI4" style="text-align: center; width: 100px; " >0</td>
+                </tr>
+                <!--    Регулятор момента в мотор. режиме       -->
+                <tr><td><p style = "font-size: 18px;" >Момент в двигательном режиме, %</p></td></tr>
+                <tr>
+                    <td><input type="range" aling="center" class="slider" min="0" max="100"  value="0" step="1" id = Schn_MtrTrqRng
+                               onchange="sendCommand('Schn_setMtrTorq', 0, this.value); set_value_by_id('SchnI5', this.value, 'red');"
+                               oninput=" set_value_by_id('SchnI5', this.value, 'blue'); "
+                    ></td>
+                    <td id="SchnI5" style="text-align: center; width: 100px; " >0</td>
+                </tr>
+                <!--    Регулятор частоты       -->
+                 <tr><td><p style = "font-size: 18px;" >Частота, Гц*10</p></td></tr>
+                <tr>
+                    <td><input type="range" aling="center" class="slider" min="0" max="500"  value="0" step="1" id = Schn_FreqRng
+                               onchange="sendCommand('Schn_setFreq', 0, this.value); set_value_by_id('SchnI3', this.value, 'red');"
+                               oninput=" set_value_by_id('SchnI3', this.value, 'blue'); "
+                    ></td>
+                    <td id="SchnI3" style="text-align: center; width: 100px; " >0</td>
+                </tr>
+            </table>
         </div>
 <!--выпадающий список пустой-->
         <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Сценарии тестов</button>

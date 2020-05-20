@@ -1,3 +1,4 @@
+import datetime
 import json
 import multiprocessing
 
@@ -11,6 +12,7 @@ import os.path
 from tornado import httputil
 from tornado.options import define, options
 import modbus_srv
+import schn
 
 define("port", default=8080, help="run on the given port", type=int)
 
@@ -65,6 +67,7 @@ class app(tornado.web.Application):
                 input_names=app.input_names,
                 holding_names=app.holding_names,
                 logfile=app.logfileCmd,
+                schn_iname=schn.schn_iname
             )
 
     class SaveMpchParamHandler(tornado.web.RequestHandler):
@@ -89,14 +92,12 @@ class app(tornado.web.Application):
     class WebSocketHandler(tornado.websocket.WebSocketHandler):
         def open(self):
             tmp = '{"CMD":"%s"}'
-            print("new connection", id(self))
-            print("new connection", self)
-            print("new connection", self.current_user)
-
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "new connection", id(self))
             app.clients.append(self)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_AllHoldings)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_SlaveID)
             app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_Status)
+            app.taskQ.put(tmp % modbus_srv.Commands.Schn_getID)
 
         def on_message(self, message):
             #self.write_message('got message! ' + message )
@@ -104,7 +105,7 @@ class app(tornado.web.Application):
 
 
         def on_close(self):
-            print("connection closed")
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "connection closed")
             app.clients.remove(self)
 
 

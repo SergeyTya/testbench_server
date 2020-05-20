@@ -1,15 +1,17 @@
 
 //var socket = new WebSocket("ws://192.168.1.248:8080/ws");
-var socket = new WebSocket("ws://192.168.1.196:8080/ws");
-
+//var socket = new WebSocket("ws://192.168.1.196:8080/ws");
+//var socket = new WebSocket("ws://localhost:8080/ws");
+var socket = new WebSocket("ws://192.168.178.133:8080/ws");
 
 socket.onopen = function(){
     console.log("connected");
 };
 
-function set_value_by_id(ID, value){
+function set_value_by_id(ID, value , color){
    tmp = document.getElementById(ID);
    if(tmp!=null)tmp.innerHTML=value
+   if(color!=null) tmp.style.background = color
 }
 
 var indi_counter=0;
@@ -39,14 +41,23 @@ socket.onmessage = function (message) {
         }
          var tmp = document.getElementById(key);
 
-         if(tmp!=null){
+
+         if(key == "SchnI3"| key == "SchnI4" | key == "SchnI5"){
+            tmp = document.getElementById(key);
+            if(tmp.style.background == "blue") continue;
+            if(tmp.style.background == "red"){
+                if(tmp.innerHTML == dict[key].value)tmp.style.background = "green";
+                continue;
+            }
+         }
+
+         if(tmp!=null){ // schneider range change by indicator color
             tmp.innerHTML=dict[key].value;
             if(key=="MPCH_Status"){
                 if ("color" in dict[key] ) tmp.style.color = dict[key].color
             }else{
                 if ("color" in dict[key] ) tmp.style.background = dict[key].color
             }
-
          }
 
          tmp = document.getElementsByName(key)[0];

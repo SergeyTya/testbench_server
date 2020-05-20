@@ -1,6 +1,9 @@
+import datetime
 import json
 import multiprocessing
 # import termios
+import termios
+
 import minimalmodbus
 import serial
 import time
@@ -17,6 +20,15 @@ class Commands(object):
     MPCH_Set_OneHolding = "MPCH_Set_OneHolding"
     MPCH_saveToFile = "MPCH_saveToFile"
     MPCH_reconnect = "MPCH_reconnect"
+    Schn_getID = "Schn_getID"
+    Schn_reconnect = "Schn_reconnect"
+    Schn_setGenTorq = "Schn_setGenTorq"
+    Schn_setMtrTorq = "Schn_setMtrTorq"
+    Schn_setFreq = "Schn_setFreq"
+    Schn_start = "Schn_start"
+    Schn_stop =  "Schn_stop"
+    Schn_reset = "Schn_reset"
+
 
 
 class TestBench(multiprocessing.Process):
@@ -26,8 +38,8 @@ class TestBench(multiprocessing.Process):
         self.taskQ = taskQ
         self.resultQ = resultQ
 
-        # port = "/dev/ttyUSB0"
-        port = "COM6"
+        port = "/dev/ttyUSB0"
+        # port = "COM6"
         instrument = minimalmodbus.Instrument(port, 2)
         instrument.serial.baudrate = 9600
         instrument.serial.bytesize = 8
@@ -47,12 +59,20 @@ class TestBench(multiprocessing.Process):
 
         self.command = {
             Commands.MPCH_Get_AllHoldings: self.MPCH.getAllHoldings,
-            Commands.MPCH_Get_SlaveID: self.MPCH.refresh,
+            Commands.MPCH_Get_SlaveID: self.MPCH.get_slaveID,
             Commands.MPCH_Get_Status: self.MPCH.getStatus,
             Commands.MPCH_Get_OneHolding: self.MPCH.getOneHolding,
             Commands.MPCH_Set_OneHolding: self.MPCH.setOneHolding,
             Commands.MPCH_saveToFile: self.MPCH.saveToFile,
-            Commands.MPCH_reconnect: self.MPCH.refresh
+            Commands.MPCH_reconnect: self.MPCH.refresh,
+            Commands.Schn_getID: self.Schn.get_slaveID,
+            Commands.Schn_reconnect: self.Schn.refresh,
+            Commands.Schn_setGenTorq: self.Schn.set_gtorque,
+            Commands.Schn_setFreq: self.Schn.set_freq,
+            Commands.Schn_setMtrTorq: self.Schn.set_mtorque,
+            Commands.Schn_reset: self.Schn.reset,
+            Commands.Schn_start: self.Schn.start,
+            Commands.Schn_stop: self.Schn.stop
         }
 
     def write_console(self, mes):
@@ -66,7 +86,7 @@ class TestBench(multiprocessing.Process):
         while not self.taskQ.empty():
             self.cnt = self.cnt + 1
             tmp = self.taskQ.get()
-            print("get task: ", tmp)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "get task: ", tmp)
             self.MPCH.writeCmdLog(tmp)
             try:
                 dict = json.loads(tmp)
@@ -88,12 +108,12 @@ class TestBench(multiprocessing.Process):
                 # self.write_console("done")
             except KeyError as e:
                 print('KeyError' + str(e))
-                self.write_console('KeyError' + str(e))
+                self.write_console('KeyError : ' + str(e))
             except (
                     minimalmodbus.NoResponseError,
                     minimalmodbus.InvalidResponseError,
             ) as e:
-                print(e)
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", e)
                 self.MPCH.connection_error_count = self.MPCH.connection_error_count + 1
 
     def run(self):
@@ -101,7 +121,7 @@ class TestBench(multiprocessing.Process):
             try:
                 self.proc()
             except termios.error as e:
-                print(e)
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", e)
                 self.write_console("Port IO error")
             # except:
             #     print(" Thread unexpected error!! ")
@@ -112,9 +132,10 @@ class TestBench(multiprocessing.Process):
         tmp_str = '{"MPCH_ConCnt" : {"value" : "%d"} }' % self.cnt
         self.resultQ.put(tmp_str)
         self.cnt = self.cnt + 1
-        time.sleep(0.5)
+        time.sleep(0.1)
         self.MPCH.getAllInputs()
         self.MPCH.getStatus()
+        self.Schn.get_indicators()
 
         if self.connection_error_count != self.MPCH.connection_error_count:
             self.connection_error_count = self.MPCH.connection_error_count

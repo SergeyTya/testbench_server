@@ -20,6 +20,7 @@ class MPCH_Device(object):
         self.slave_name = ""
         self.create_logfile()
         self.adr = 1
+        self.connected:bool = False
 
         try:
             with open('status.json', 'r',
@@ -30,7 +31,7 @@ class MPCH_Device(object):
             json.decoder.JSONDecodeError,
             FileNotFoundError,
             UnicodeDecodeError
-        ) as e: print(e)
+        ) as e: print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ",e)
 
     def createRegReq(self, name, ireg, adr, color=""):
         if color == "":
@@ -45,7 +46,9 @@ class MPCH_Device(object):
 
     def getAllHoldings(self, **kwargs):
         self.instrument.address = self.adr
-
+        if not self.connected:
+            self.get_slaveID()
+            if not self.connected: return
         if len(self.inputs) < 3: return
         try:
             self.holdings = self.instrument.read_registers(0, self.inputs[1], functioncode=3)
@@ -58,7 +61,8 @@ class MPCH_Device(object):
                 minimalmodbus.ModbusException,
                 minimalmodbus.NoResponseError) as e:
             self.connection_error_count = self.connection_error_count + 1
-            print(e)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
+            self.set_disconnected()
 
     def setOneHolding(self, adr, value, **kwargs):
         self.instrument.address = self.adr
@@ -66,6 +70,9 @@ class MPCH_Device(object):
             value = int(value)
             adr = int(adr)
         except ValueError: return
+        if not self.connected:
+            self.get_slaveID()
+            if not self.connected: return
         if len(self.holdings) < adr: return
         try:
             self.instrument.write_register(adr, value, signed=False)
@@ -77,34 +84,59 @@ class MPCH_Device(object):
                 minimalmodbus.ModbusException,
                 minimalmodbus.NoResponseError) as e:
             self.connection_error_count = self.connection_error_count + 1
-            print(e)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
+            self.set_disconnected()
 
 
     def getOneHolding(self, adr, **kwargs):
         self.instrument.address = self.adr
+        if not self.connected: self.get_slaveID()
         try:
             num = int(adr)
         except ValueError: return
         if len(self.holdings) < adr: return
-        tmp = self.instrument.read_register(adr, 0, functioncode=3)
-        # print("Get holding %d: %d" % (adr, tmp))
-        if adr < len(self.holdings): self.holdings[adr] = tmp
-        tmp = self.createRegReq(
-            ["MPCH_hreg"],
-            [self.holdings[num]],
-            [num],
-            ["white"])
-        self.resultQ.put(tmp)
-        self.writeCmdLog(tmp)
+        if not self.connected:
+            self.get_slaveID()
+            if not self.connected: return
+        try:
+            tmp = self.instrument.read_register(adr, 0, functioncode=3)
+            # print("Get holding %d: %d" % (adr, tmp))
+            if adr < len(self.holdings): self.holdings[adr] = tmp
+            tmp = self.createRegReq(
+                ["MPCH_hreg"],
+                [self.holdings[num]],
+                [num],
+                ["white"])
+            self.resultQ.put(tmp)
+            self.writeCmdLog(tmp)
+        except (
+                minimalmodbus.InvalidResponseError,
+                minimalmodbus.ModbusException,
+                minimalmodbus.NoResponseError) as e:
+            self.connection_error_count = self.connection_error_count + 1
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
+            self.set_disconnected()
+
+    def set_disconnected(self):
+        self.slave_name = "disconnected"
+        self.connected: bool = False
+        tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % self.slave_name
+        self.resultQ.put(tmp_str)
+        self.write_console(tmp_str)
+        self.writeCmdLog(tmp_str)
 
     def getAllInputs(self, **kwargs):
         self.instrument.address = self.adr
+        if not self.connected:
+            self.get_slaveID()
+            if not self.connected: return
         try:
+            if not self.connected: self.get_slaveID()
             if len(self.inputs) < 3: return
             self.inputs = self.instrument.read_registers(0, self.inputs[0], functioncode=4)
             tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[3:], range(6))
             self.resultQ.put(tmp)
-            now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             tmp = tmp[:1] + '"time":' + now + tmp[1:]
             self.logfileIndic.write(tmp + '\n')
             # self.logfile.flush()
@@ -116,11 +148,13 @@ class MPCH_Device(object):
                 minimalmodbus.ModbusException,
                 minimalmodbus.NoResponseError) as e:
             self.connection_error_count = self.connection_error_count + 1
-            print(e)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
+            self.set_disconnected()
+
 
     def refresh(self, **kwargs):
         self.instrument.address = self.adr
-        print("Refreshing MPCH device")
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Refreshing MPCH device")
         self.slave_name = "нет устройства"
         self.connection_error_count = 0
         self.dev_status = None
@@ -129,7 +163,7 @@ class MPCH_Device(object):
         try:
             req = self.instrument._perform_command(43, '\x0E\x01\x01\x00\x00')
             self.slave_name = req[8:16] + req[32:40] + req[44:52]
-            print("MPCH ID: ", self.slave_name)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "MPCH ID: ", self.slave_name)
             self.write_console("MPCH ID: " + self.slave_name)
             tmp = self.instrument.read_registers(0, 2, functioncode=4)
             print("Holdings count: ", tmp[1])
@@ -144,17 +178,38 @@ class MPCH_Device(object):
                 minimalmodbus.ModbusException,
                 minimalmodbus.NoResponseError) as e:
             self.connection_error_count = self.connection_error_count + 1
-            print(e)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
             self.write_console(str(e))
             self.holdings = []
             self.inputs = []
-
-
+            self.set_disconnected()
         tmp_id = self.slave_name
         tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % tmp_id
         self.resultQ.put(tmp_str)
         self.write_console(tmp_str)
         self.writeCmdLog(tmp_str)
+
+    def get_slaveID(self, **kwargs):
+        self.instrument.address = self.adr
+        try:
+            req = self.instrument._perform_command(43, '\x0E\x01\x01\x00\x00')
+            self.slave_name = req[8:16] + req[32:40] + req[44:52]
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "MPCH ID: ", self.slave_name)
+            self.write_console("MPCH ID: " + self.slave_name)
+            tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % self.slave_name
+            self.resultQ.put(tmp_str)
+            self.write_console(tmp_str)
+            self.writeCmdLog(tmp_str)
+            self.connected = True
+            return True
+        except (
+                minimalmodbus.InvalidResponseError,
+                minimalmodbus.ModbusException,
+                minimalmodbus.NoResponseError) as e:
+            self.connection_error_count = self.connection_error_count + 1
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
+            self.write_console(str(e))
+            return False
 
     def getStatus(self, **kwargs):
         tmp_str = ""

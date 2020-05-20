@@ -7,6 +7,7 @@ import tornado.web
 import tornado.websocket
 import tornado.gen
 from tornado.options import define, options
+import datetime
 
 
 if __name__ == "__main__":
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(tornado_srv.app())
     http_server.listen(options.port)
-    print("Listening on port:", options.port)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Listening on port:", options.port)
 
 
     def modbus_listener():
