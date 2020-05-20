@@ -136,7 +136,7 @@ class MPCH_Device(object):
             self.inputs = self.instrument.read_registers(0, self.inputs[0], functioncode=4)
             tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[3:], range(6))
             self.resultQ.put(tmp)
-            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')
             tmp = tmp[:1] + '"time":' + now + tmp[1:]
             self.logfileIndic.write(tmp + '\n')
             # self.logfile.flush()
