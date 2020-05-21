@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import minimalmodbus
 import serial
+import ctypes
 
 
 class MPCH_Device(object):
@@ -134,6 +135,7 @@ class MPCH_Device(object):
             if not self.connected: self.get_slaveID()
             if len(self.inputs) < 3: return
             self.inputs = self.instrument.read_registers(0, self.inputs[0], functioncode=4)
+            self.inputs[3] = ctypes.c_int16(self.inputs[3]).value
             tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[3:], range(6))
             self.resultQ.put(tmp)
             now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')

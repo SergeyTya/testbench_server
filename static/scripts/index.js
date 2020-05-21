@@ -43,12 +43,14 @@ socket.onmessage = function (message) {
 
 
          if(key == "SchnI3"| key == "SchnI4" | key == "SchnI5"){
-            tmp = document.getElementById(key);
-            if(tmp.style.background == "blue") continue;
-            if(tmp.style.background == "red"){
-                if(tmp.innerHTML == dict[key].value)tmp.style.background = "green";
+
+                tmp = document.getElementById(key);
+                if(tmp.style.background == "blue") continue;
+                if(tmp.style.background == "red"){
+                if(Number(tmp.innerHTML) == dict[key].value){tmp.style.background = "green";}else{}
                 continue;
             }
+
          }
 
          if(tmp!=null){ // schneider range change by indicator color

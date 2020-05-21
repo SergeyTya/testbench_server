@@ -332,65 +332,73 @@
                      tmp.innerHTML='обновление'
                      sendCommand('Schn_reconnect')
                      sendCommand('Schn_getID') "/></br>
-                <span>Статус:</span> <span ID="Schn_St">нет устройства</span></br>
             </div>
 
-            <table style=" background: #272C2F;" align="center">
+            <table style=" background: #272C2F; font-size: 24px;"  align="center" >
                 <tr > <!--    Цифровые индикаторы        -->
-                    <td colspan = "2">
-                        <table style=" display: inline-block; background: #272C2F;">
+                    <td align="right" width="300">
+                        <table style=" display: inline-block; background: #272C2F;" >
                             <tr align = "center"><td class="idndi_label">Скорость, об/мин</td></tr>
                             <tr><td id="SchnI0" class="idndi_digit">0.0</td></tr>
                         </table>
-                        <table style=" display: inline-block; background: #272C2F;">
+                    </td>
+                    <td align="center" width="300">
+                        <table style=" display: inline-block; background: #272C2F;" >
                             <tr align = "center"><td class="idndi_label">Ток, А</td></tr>
                             <tr><td id="SchnI1" class="idndi_digit">0.0</td></tr>
                         </table>
-                        <table style=" display: inline-block; background: #272C2F;">
+                    </td>
+                    <td align="left" width="300">
+                        <table style=" display: inline-block; background: #272C2F;" >
                             <tr align = "center"><td class="idndi_label">Момент, %</td></tr>
                             <tr><td id="SchnI2" class="idndi_digit">0.0</td></tr>
                         </table>
                     </td>
                 </tr>
                 <tr valign="top"> <!--    Кнопки управления        -->
-                    <td align="center" colspan = "2">
+                    <td align="center">
                         <button class="RoundCB" style="background-color: #74BD79;" onclick=" sendCommand('Schn_start');" >ПУСК</button>
-                        <button class="RoundCB" style="background-color: #E45B59;" onclick=" sendCommand('Schn_stop'); sendCommand('Schn_reset');">
+
+                    </td>
+                    <td align="center" valign="top">
+                         <p ID="Schn_St">нет устройства</p>
+                    </td>
+                    <td align="center">
+                         <button class="RoundCB" style="background-color: #E45B59;" onclick=" sendCommand('Schn_stop'); sendCommand('Schn_reset');">
                             <table rules="rows" align="center">
                                 <tr><td>СТОП</td></tr>
                                 <tr><td>Сброс</td></tr>
                              </table>
                         </button>
-                        <button class="RoundCB" style="background-color: #6EB1C4;">Реверс</button>
                     </td>
                 </tr>
                 <!--    Регуляторы        -->
                 <!--    Регулятор момента в ген. режиме       -->
-                <tr><td><p style = "font-size: 18px;" >Момент в генераторном режиме, %</p></td></tr>
+                <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в генераторном режиме</p></td></tr>
                 <tr>
-                    <td><input type="range" aling="center" class="slider" min="0" max="100"  value="0" step="1" id = Schn_GenTrqRng
-                               onchange="sendCommand('Schn_setGenTorq', 0, this.value); set_value_by_id('SchnI4', this.value, 'red');"
-                               oninput=" set_value_by_id('SchnI4', this.value, 'blue'); "
+                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id = Schn_GenTrqRng
+                               onchange="sendCommand('Schn_setGenTorq', 0, this.value);  set_value_by_id('SchnI4', (this.value/10).toString(), 'red');"
+                               oninput=" set_value_by_id('SchnI4', (this.value/10).toString(), 'blue'); "
                     ></td>
-                    <td id="SchnI4" style="text-align: center; width: 100px; " >0</td>
+                     <td align="center" ><span id="SchnI4">0</span> %</td>
                 </tr>
                 <!--    Регулятор момента в мотор. режиме       -->
-                <tr><td><p style = "font-size: 18px;" >Момент в двигательном режиме, %</p></td></tr>
+                <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в двигательном режиме</p></td></tr>
                 <tr>
-                    <td><input type="range" aling="center" class="slider" min="0" max="100"  value="0" step="1" id = Schn_MtrTrqRng
-                               onchange="sendCommand('Schn_setMtrTorq', 0, this.value); set_value_by_id('SchnI5', this.value, 'red');"
-                               oninput=" set_value_by_id('SchnI5', this.value, 'blue'); "
+                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id = Schn_MtrTrqRng
+                               onchange="sendCommand('Schn_setMtrTorq', 0, this.value); set_value_by_id('SchnI5', (this.value/10).toString(), 'red');"
+                               oninput=" set_value_by_id('SchnI5', (this.value/10).toString(), 'blue'); "
                     ></td>
-                    <td id="SchnI5" style="text-align: center; width: 100px; " >0</td>
+                     <td align="center" ><span id="SchnI5">0</span> %</td>
                 </tr>
                 <!--    Регулятор частоты       -->
-                 <tr><td><p style = "font-size: 18px;" >Частота, Гц*10</p></td></tr>
+                 <tr><td colspan="3"><p style = "font-size: 18px;" >Частота</p></td></tr>
                 <tr>
-                    <td><input type="range" aling="center" class="slider" min="0" max="500"  value="0" step="1" id = Schn_FreqRng
-                               onchange="sendCommand('Schn_setFreq', 0, this.value); set_value_by_id('SchnI3', this.value, 'red');"
-                               oninput=" set_value_by_id('SchnI3', this.value, 'blue'); "
+                    <td colspan="2"><input type="range" aling="center" class="slider" min="-500" max="500"  value="0" step="1" id = Schn_FreqRng
+                               onchange="sendCommand('Schn_setFreq', 0, this.value); set_value_by_id('SchnI3', (this.value/10).toString(), 'red');"
+                               oninput=" set_value_by_id('SchnI3', (this.value/10).toString(), 'blue'); "
                     ></td>
-                    <td id="SchnI3" style="text-align: center; width: 100px; " >0</td>
+                    <td align="center" ><span id="SchnI3" style="width = 10px; ">0</span> Гц</td>
                 </tr>
             </table>
         </div>

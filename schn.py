@@ -1,3 +1,4 @@
+import ctypes
 import datetime
 import json
 import multiprocessing
@@ -29,13 +30,13 @@ class Schn_Device(object):
     def createRegReq(self, name, ireg, adr, color=""):
         if color == "":
             tmp_str = "{" + ','.join(list(map(
-                # lambda nm, x, y: '"%s%d":{"value":"%5.1f"} ' % (nm, y, x), name, ireg, adr
-                lambda nm, x, y: '"%s%d":{"value":"%d"} ' % (nm, y, x), name, ireg, adr
+                lambda nm, x, y: '"%s%d":{"value":"%5.1f"} ' % (nm, y, x), name, ireg, adr
+                # lambda nm, x, y: '"%s%d":{"value":"%d"} ' % (nm, y, x), name, ireg, adr
             ))) + "}"
         else:
             tmp_str = "{" + ','.join(list(map(
-                # lambda nm, x, y, z: '"%s%d":{"value":"%5.1f" , "color" : "%s"} ' % (nm, y, x, z), name, ireg, adr, color
-                lambda nm, x, y, z: '"%s%d":{"value":"%d" , "color" : "%s"} ' % (nm, y, x, z), name, ireg, adr, color
+                 lambda nm, x, y, z: '"%s%d":{"value":"%5.1f" , "color" : "%s"} ' % (nm, y, x, z), name, ireg, adr, color
+                # lambda nm, x, y, z: '"%s%d":{"value":"%d" , "color" : "%s"} ' % (nm, y, x, z), name, ireg, adr, color
             ))) + "}"
         return tmp_str
 
@@ -45,15 +46,20 @@ class Schn_Device(object):
             self.get_slaveID()
             if not self.connected: return
         try:
-            tmp = self.instrument.read_registers(3201, 11, functioncode=3)
-            # print(tmp)
+            # current + torque
+            tmp = self.instrument.read_registers(3201, 5, functioncode=3)
             self.dev_status = tmp[0]
-            self.indicators[0] = self.instrument.read_registers(8604, 1, functioncode=3)[0]
-            self.indicators[1] = tmp[3]*0.1   # curr
-            self.indicators[2] = tmp[4]*0.1  # Torque
-            self.indicators[3] = self.instrument.read_registers(8502, 1, functioncode=3)[0]
-            self.indicators[4] = self.instrument.read_registers(9212, 1, functioncode=3)[0]
-            self.indicators[5] = self.instrument.read_registers(9211, 1, functioncode=3)[0]
+            self.indicators[1] = ctypes.c_int16(tmp[3]).value * 0.1    # curr
+            self.indicators[2] = ctypes.c_int16(tmp[4]).value * 0.1    # Torque
+            # speed
+            tmp = self.instrument.read_registers(8604, 1, functioncode=3)[0]
+            self.indicators[0] = ctypes.c_int16(tmp).value
+            # frequency reference
+            self.indicators[3] = ctypes.c_int16(self.instrument.read_registers(8502, 1, functioncode=3)[0]).value * 0.1
+            # Torque limits
+            tmp = self.instrument.read_registers(9211, 2, functioncode=3)
+            self.indicators[4] = tmp[1]*0.1  # generator mode
+            self.indicators[5] = tmp[0]*0.1  # motor mode
 
             tmp = self.createRegReq(["SchnI"] * len(self.indicators), self.indicators, range(6))
             self.resultQ.put(tmp)
@@ -127,7 +133,7 @@ class Schn_Device(object):
         except ValueError:
             return
         self.instrument.address = self.adr
-        self.instrument.write_register(8502, value)
+        self.instrument.write_register(8502, value, signed=True)
 
     def set_gtorque(self, value,  **kwargs):
         try:
@@ -223,10 +229,5 @@ if __name__ == '__main__':
     #     schndr.get_indicators()
     #     time.sleep(0.5)
 
-    bnr = format(int(563), 'b').zfill(16)
-    print(bnr)
-    print(bnr[13])
-    bnr = format(int(567), 'b').zfill(16)
-    print(bnr)
-    bnr = format(int(1591), 'b').zfill(16)
-    print(bnr)
+    a =65000
+    print(ctypes.c_int16(a).value)
