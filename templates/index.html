@@ -56,22 +56,29 @@
         background-color:#272C2F;
         color: #909091;
         font-family:'Open Sans', verdana, arial, sans-serif">
-        <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span>
-        <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+
+        <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
+        <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
+    </div>
+<!-- Статус -->
+    <div>
+<!--    Цифровые индикаторы        -->
+          <div style=" background-color:#272C2F;color: #909091; font-family:'Open Sans', verdana, arial, sans-serif">
+              <p style = "background-color: #272C2F; color: #D4D4D4; padding: 5px; text-align: left;text-decoration: underline;font-size: 18px;"> Индикаторы МПЧ </p>
+              <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span><input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
                  tmp = document.getElementById('MPCH_ID')
                  tmp.innerHTML='обновление'
                  sendCommand('MPCH_reconnect')
                  sendCommand('MPCH_Get_SlaveID') "/></br>
-        <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
-        <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
-        <span>Ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
-<!--        <span>Всего клиентов: </span>  <span ID="ClientCount"> 0 <span> </span></span></br>-->
-        <a href = {{logfile.name}} target="_blank"> Посмотреть лог </a>
-    </div>
-<!-- Статус -->
-    <div>
-        <div ID="MPCH_Status"
-             style="
+              <span>Код статуса: </span>   <span id={{"plotlyIndi"+str(0)}}> 0 <span> </span></span></br>
+              <span>Ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
+              <a href = {{logfile.name}} target="_blank" style="color:#F97400;"> Посмотреть лог </a>
+         </div>
+
+            <table style="font-size: 10px; margin:10 auto" align="center">
+
+                <tr>
+                    <td colspan="3"><div ID="MPCH_Status" style="
                 text-align:center;
                 margin:10 auto;
                 font-size: 32px;
@@ -79,103 +86,107 @@
                 font-weight: bold;
                 background-color:#272C2F;
                 padding: 5px;
-             "
-        >  нет соединения  </div>
-<!--    Цифровые индикаторы        -->
-            <ul style="font-size: 10px; margin:10 auto">
-                {% for i in range(6) %}
-               <table style=" display: inline-block; background: #272C2F;">
-                    <tr align = "center"><td class="idndi_label">{{ input_names[i][0] }}</td></tr>
-                    <tr><td id={{"plotlyIndi"+str(i)}} class="idndi_digit" style="cursor: pointer;"
+             ">  нет соединения  </div></td>
+                </tr>
+
+                <tr><td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                    <tr align = "center"><td class="idndi_label">{{ input_names[0][0] }}</td></tr>
+                    <tr><td id={{"plotlyIndi"+str(1)}} class="idndi_digit" style="cursor: pointer;"
                         onclick="window.open('/statistics');"
-                    >0.0</td></tr>
-                </table>
-                {% end %}
-            </ul>
+                        >0.0</td></tr></table></td>
+
+                    <td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                        <tr align = "center"><td class="idndi_label">{{ input_names[4][0] }}</td></tr>
+                        <tr><td id={{"plotlyIndi"+str(5)}} class="idndi_digit" style="cursor: pointer;"
+                        onclick="window.open('/statistics');"
+                        >0.0</td></tr></table></td>
+
+                    <td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                        <tr align = "center"><td class="idndi_label">{{ input_names[5][0] }}</td></tr>
+                        <tr><td id={{"plotlyIndi"+str(6)}} class="idndi_digit" style="cursor: pointer;"
+                        onclick="window.open('/statistics');"
+                        >0.0</td></tr></table></td>
+                </tr>
+
+                <tr><td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                        <tr align = "center"><td class="idndi_label">{{ input_names[1][0] }}</td></tr>
+                        <tr><td id={{"plotlyIndi"+str(2)}} class="idndi_digit" style="cursor: pointer;"
+                        onclick="window.open('/statistics');"
+                        >0.0</td></tr></table></td>
+
+                    <td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                        <tr align = "center"><td class="idndi_label">{{ input_names[2][0] }}</td></tr>
+                        <tr><td id={{"plotlyIndi"+str(3)}} class="idndi_digit" style="cursor: pointer;"
+                                onclick="window.open('/statistics');"
+                        >0.0</td></tr></table></td>
+
+                    <td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
+                        <tr align = "center"><td class="idndi_label">{{ input_names[3][0] }}</td></tr>
+                        <tr><td id={{"plotlyIndi"+str(4)}} class="idndi_digit" style="cursor: pointer;"
+                        onclick="window.open('/statistics');"
+                        >0.0</td></tr></table></td>
+                </tr>
+            </table>
     </div>
     <div> <!--блок выпадающих списков-->
         <!--выпадающий список управление-->
         <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление МПЧ</button>
         <div class="panel"> <!--выпадающий список управление-->
-   <table width="300" border="0" cellpadding="5" cellspacing="0" align="center">  <!--таблица с элементами управления-->
-     <tr>
-         <td width="120"  height="30"><!--кнопка пуск-->
-             <button class="RoundCB" style="background-color: #74BD79;"
-                onclick=" sendCommand('MPCH_Set_OneHolding',0, '1') ">ПУСК</button>
-         </td>
-         <td valign="top"><!--кнопка стоп сброс-->
-             <button class="RoundCB" style="background-color: #E45B59;"
-                   onclick=" sendCommand('MPCH_Set_OneHolding',0, '2'); sendCommand('MPCH_Set_OneHolding',0, '4');">
-                <table rules="rows" align="center">
-                    <tr><td>СТОП</td></tr>
-                    <tr><td>Сброс</td></tr>
-                </table>
-             </button>
-         </td>
-
-       <td  valign="top" rowspan="2">
-         <table border="0">
-           <tr><td height="10"><!-- заголовок-->
-             <span style="font-size: 18px; padding: 20px">Задание частоты:</span>
-           </td></tr>
-           <tr><td height="100" align = "center"><!--индикатор частоты-->
-               <table>
-                   <tr>
-                       <td>
-                           <input type="Number" class = "FreqDigit" id="CFreqDigit" value="0.0" size = "2" step ="0.1"
-                                  onchange="
-                                var val = document.getElementsByName('MPCH_hreg5')[0].value;
-                                if(val==null) return;
-                                tmp = this.value*10;
-                                if(tmp > val){
-                                    tmp=val;
-                                    this.value=val/10;
-                                }
-                                sendCommand('MPCH_Set_OneHolding',3, tmp);
-                                "
-                           >
-                       </td>
-                       <td>
-                           <span class = "FreqDigit" style=" width: 80px;" >Гц</span>
-                       </td>
-                   </tr>
-               </table>
-           </td></tr>
-           <tr><td height="40" > <!--ползунок частоты-->
-             <input type="range" aling="center" class="slider" min="0" max="1000"
-                    value="0" step="1" id="CFreqRange"
+        <div><table border="0" cellpadding="5" cellspacing="0" align="center">  <!--таблица с элементами управления-->
+            <tr> <!--Регуляторы--> <!--    Регулятор  частоты МПЧ       -->
+                <td colspan="3" ><p style = "font-size: 18px;" >Задание частоты</p></td>
+            </tr>
+             <tr>
+                <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id="MPCH_FreqCntrl"
                 onchange="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
                         if(val==null) return;
-                        tmp = Number(val*this.value/1000);
-                        sendCommand('MPCH_Set_OneHolding',3, tmp.toFixed(0));
+                        tmp = Number(val*this.value/1000).toFixed(0);
+                        sendCommand('MPCH_Set_OneHolding',3, tmp);
+                        sendCommand('MPCH_Get_OneHolding',3, 0);
+                        set_value_by_id('MPCH_FRI', (tmp*0.1).toFixed(1), 'red');
                 "
                 oninput="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
                         if(val==null) return;
-                        tmp = document.getElementById('CFreqDigit');
-                        tmp.value =Number(val*this.value/1000).toFixed(0)/10;
+                        tmp = Number(val*this.value*0.001);
+                        set_value_by_id('MPCH_FRI', (tmp*0.1).toFixed(1), 'blue');
                 "
-             >
-           </td></tr>
-         </table>
-       </td>
-        <td width="240"  height="30"  valign="top"><!--индикатор направления-->
-            <input type="text" class="RoundCB" value="Вперед" id="CDirIndi" style="background-color: #393E41;">
-        </td>
-         <td width="240"  height="30" rowspan="1" ><!--кнопка реверс-->
-             <button class="RoundCB" style="background-color: #6EB1C4;" onclick="
-                    var val = document.getElementsByName('MPCH_hreg4')[0].value;
-                    if(val==null) return;
-                    if(val == '0') sendCommand('MPCH_Set_OneHolding',4, 1);
-                    if(val == '1') sendCommand('MPCH_Set_OneHolding',4, 0);"
-             >Реверс</button>
-         </td>
-     </tr>
-  </table>
-        </div>
+                 ></td><td align="center" ><span id="MPCH_FRI">0</span> Гц</td>
+             </tr>
+             <tr> <!--    Регулятор  направления МПЧ       -->
+                <td colspan="3"><p style = "font-size: 18px;" >Направление вращения</p></td></tr>
+             <tr>
+             <tr><td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1"  value="0" step="1" id="MPCH_DirCntrl"
+                onchange="
+                        if(this.value == 1)set_value_by_id('MPCH_FDI', 'Обратное', 'red');
+                        if(this.value == 0)set_value_by_id('MPCH_FDI', 'Прямое', 'red');
+                        sendCommand('MPCH_Set_OneHolding',4, this.value);
+                        sendCommand('MPCH_Get_OneHolding',4, 0);
+                "
+            ></td><td align="center" ><span id="MPCH_FDI">Вперед</span></td></tr>
 
-<!--&lt;!&ndash;выпадающий список регистров хранения&ndash;&gt;-->
+             <tr> <!--Кнопки управления -->
+                <td width="300"  align="right"><!--кнопка пуск-->
+                <button class="RoundCB" style="background-color: #74BD79;"
+                    onclick=" sendCommand('MPCH_Set_OneHolding',0, '1') ">ПУСК</button>
+                </td>
+                <td width="300"> <span> </span></td>
+                <td align="left" width="300"><!--кнопка стоп сброс-->
+                    <button class="RoundCB" style="background-color: #E45B59;"
+                        onclick=" sendCommand('MPCH_Set_OneHolding',0, '2'); sendCommand('MPCH_Set_OneHolding',0, '4');">
+                        <table rules="rows" align="center">
+                            <tr><td>СТОП</td></tr>
+                            <tr><td>Сброс</td></tr>
+                        </table>
+                    </button>
+                </td>
+            </tr>
+
+        </table></div>
+    </div>
+
+<!--выпадающий список регистров хранения-->
 <!--<button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>-->
 <!--<div class="panel">-->
 <!--        {% for i in range(len(input_names)) %}-->
@@ -323,8 +334,8 @@
         <div class="panel">
             <div style="
                     margin: 5px;
-                    background-color:#272C2F;
-                    color: #909091;
+                   // background-color:#272C2F;
+                   // color: #909091;
                     font-family:'Open Sans', verdana, arial, sans-serif">
                 <span>ID устройства:</span> <span ID="Schn_ID">нет устройства</span>
                 <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="

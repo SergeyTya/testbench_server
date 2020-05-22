@@ -69,17 +69,17 @@ class MPCH_Device(object):
         self.instrument.address = self.adr
         try:
             value = int(value)
-            adr = int(adr)
+            adr1 = int(adr)
         except ValueError: return
         if not self.connected:
             self.get_slaveID()
             if not self.connected: return
-        if len(self.holdings) < adr: return
+        if len(self.holdings) < adr1: return
         try:
-            self.instrument.write_register(adr, value, signed=False)
+            self.instrument.write_register(adr1, value, signed=False)
             # print("Set holding %d: %d" % (adr, value))
 
-            self.getOneHolding(adr)
+            self.getOneHolding(adr1)
         except (
                 minimalmodbus.InvalidResponseError,
                 minimalmodbus.ModbusException,
@@ -95,14 +95,14 @@ class MPCH_Device(object):
         try:
             num = int(adr)
         except ValueError: return
-        if len(self.holdings) < adr: return
+        if len(self.holdings) < num: return
         if not self.connected:
             self.get_slaveID()
             if not self.connected: return
         try:
-            tmp = self.instrument.read_register(adr, 0, functioncode=3)
+            tmp = self.instrument.read_register(num, 0, functioncode=3)
             # print("Get holding %d: %d" % (adr, tmp))
-            if adr < len(self.holdings): self.holdings[adr] = tmp
+            if num < len(self.holdings): self.holdings[num] = tmp
             tmp = self.createRegReq(
                 ["MPCH_hreg"],
                 [self.holdings[num]],
@@ -136,7 +136,7 @@ class MPCH_Device(object):
             if len(self.inputs) < 3: return
             self.inputs = self.instrument.read_registers(0, self.inputs[0], functioncode=4)
             self.inputs[3] = ctypes.c_int16(self.inputs[3]).value
-            tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[3:], range(6))
+            tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[2:], range(7))
             self.resultQ.put(tmp)
             now = datetime.datetime.now().strftime('"%Y-%m-%d %H:%M:%S", ')
             tmp = tmp[:1] + '"time":' + now + tmp[1:]

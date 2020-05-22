@@ -42,6 +42,7 @@ class Schn_Device(object):
 
     def get_indicators(self):
         self.instrument.address = self.adr
+        self.get_status()
         if not self.connected:
             self.get_slaveID()
             if not self.connected: return
@@ -63,7 +64,6 @@ class Schn_Device(object):
 
             tmp = self.createRegReq(["SchnI"] * len(self.indicators), self.indicators, range(6))
             self.resultQ.put(tmp)
-            self.get_status()
         except (
                 minimalmodbus.InvalidResponseError,
                 minimalmodbus.ModbusException,
@@ -104,6 +104,7 @@ class Schn_Device(object):
         self.connected: bool = False
         tmp_str = '{"Schn_ID" : {"value" : "%s"} }' % self.slave_name
         self.resultQ.put(tmp_str)
+
         self.write_console(tmp_str)
 
     def start(self, **kwargs):
@@ -155,7 +156,7 @@ class Schn_Device(object):
         self.instrument.write_register(9211, value)
 
     def get_status(self,  **kwargs):
-        if self.dev_status == 0xFFFF: return ""
+        # if self.dev_status == 0xFFFF: return ""
         atv_state = [
             'Ready to ON', 'Swithed ON', 'Oper enbl1', 'Fault',
             'Vltg dsbl', 'Quick stop', 'Switch on dsbl', 'Alarm',
@@ -173,7 +174,10 @@ class Schn_Device(object):
 
         if bnr[14] == '1': tmp_str = '{"Schn_St" : {"value" : "Остановлен" , "color": "blue"} }'
         if bnr[13] == '1': tmp_str = '{"Schn_St" : {"value" : "Работа" , "color": "green"} }'
-        if bnr[12] == '1': tmp_str = '{"Schn_St" : {"value" : "Авария", , "color": "red"} }'
+        if bnr[12] == '1': tmp_str = '{"Schn_St" : {"value" : "Авария", "color": "red"} }'
+        if not self.connected: tmp_str = '{"Schn_St" : {"value" : "нет связи", "color": "gray"}}'
+
+        # print(tmp_str)
 
         self.resultQ.put(tmp_str)
         # self.write_console(tmp_str)
