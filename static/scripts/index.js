@@ -1,8 +1,8 @@
 
 //var socket = new WebSocket("ws://192.168.1.248:8080/ws");
-//var socket = new WebSocket("ws://192.168.1.196:8080/ws");
+var socket = new WebSocket("ws://192.168.1.196:8080/ws");
 //var socket = new WebSocket("ws://localhost:8080/ws");
-var socket = new WebSocket("ws://192.168.178.133:8080/ws");
+//var socket = new WebSocket("ws://192.168.178.133:8080/ws");
 
 socket.onopen = function(){
     console.log("connected");

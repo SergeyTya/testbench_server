@@ -2,7 +2,7 @@ import datetime
 import json
 import multiprocessing
 # import termios
-import termios
+#import termios
 
 import minimalmodbus
 import serial
@@ -39,7 +39,7 @@ class TestBench(multiprocessing.Process):
         self.resultQ = resultQ
 
         port = "/dev/ttyUSB0"
-        # port = "COM6"
+       # port = "COM7"
         instrument = minimalmodbus.Instrument(port, 2)
         instrument.serial.baudrate = 9600
         instrument.serial.bytesize = 8
