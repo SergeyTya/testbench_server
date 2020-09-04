@@ -417,7 +417,59 @@
         <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Сценарии тестов</button>
         <div class="panel"> <!--выпадающий список управление-->
         </div>
-    </div>
+<!--выпадающий список bootloade-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Загрузчик МПЧ</button>
+        <div class="panel"> <!--выпадающий список сравнить-->
+            <div id="bconsol" style="height: 75px; overflow-y: scroll !important;"> </div>
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сравнить</button>
+            <div class = panel>
+                <p>Файл прошивки в МПЧ будет сравниваться с данными в файле</p>
+                <input type="file"  accept=".hex, .HEX" class="custom-file-input" id="verifyHex" onChange="
+                    let files = document.getElementById('verifyHex').files;
+                    file=files.item(0);
+                    console.log(file.name);
+                    var reader = new FileReader();
+                    reader.onload = function(event)
+                    {
+                        var contents = event.target.result;
+                        result = contents.split(/\r\n|\n/);
+                        sendCommand('loader_verify', 0, result);
+                    };
+                    reader.onerror = function(event) {
+                        console.error('Файл не может быть прочитан! код ' + event.target.error.code);
+                    };
+                    reader.readAsText(file)
+                    tmp = document.getElementById('bconsol');
+                    tmp.innerHTML=''
+
+                "></br>
+            </div>
+            <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Прошить</button>
+            <div class = panel>
+                <p>Файл прошивки в МПЧ будет сравниваться с данными в файле</p>
+                <input type="file"  accept=".hex, .HEX" class="custom-file-input" id="loadHex" onChange="
+                    let files = document.getElementById('loadHex').files;
+                    file=files.item(0);
+                    console.log(file.name);
+                    var reader = new FileReader();
+                    reader.onload = function(event)
+                    {
+                        var contents = event.target.result;
+                        result = contents.split(/\r\n|\n/);
+                        sendCommand('loader_write', 0, result);
+                    };
+                    reader.onerror = function(event) {
+                        console.error('Файл не может быть прочитан! код ' + event.target.error.code);
+                    };
+                    reader.readAsText(file)
+                    tmp = document.getElementById('bconsol');
+                    tmp.innerHTML=''
+
+                "></br>
+            </div>
+
+        </div>
+    </p>
 </body>
 <footer>
 <!--    <p>powered by SergeyTyagus</p>-->

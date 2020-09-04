@@ -19,7 +19,7 @@ public:
 	virtual ~SerialPort();
 
 	void setPortName();
-	 int Open();
+	 int Open(int bdr);
 	 int Close();
 	 bool isOpen();
 	 bool isClose();

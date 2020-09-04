@@ -1,8 +1,8 @@
 
 //var socket = new WebSocket("ws://192.168.1.248:8080/ws");
-var socket = new WebSocket("ws://192.168.1.196:8080/ws");
+var socket = new WebSocket("ws://192.168.1.196:8080/ws"); // PiOne
 //var socket = new WebSocket("ws://localhost:8080/ws");
-//var socket = new WebSocket("ws://192.168.178.133:8080/ws");
+//var socket = new WebSocket("ws://192.168.178.136:8080/ws"); //WM
 
 socket.onopen = function(){
     console.log("connected");
@@ -25,6 +25,7 @@ function set_value_by_name(name, value , color){
 }
 
 var indi_counter=0;
+var bconsol_count = 0;
 
 socket.onmessage = function (message) {
 
@@ -39,6 +40,14 @@ socket.onmessage = function (message) {
     for (key in  dict) {
 
         //console.log(dict[key])
+
+        if(key== "bconsol"){
+            tmp = document.getElementById(key);
+            tmp.innerHTML=dict[key].value+'<br>'+tmp.innerHTML;
+            continue
+        }else{
+            bconsol_count = 0;
+        }
 
         if(key=="MPCH_saveToFile") {
             window.open('\save_mprm');
@@ -134,3 +143,4 @@ sendMessage = function(message) {
 sendCommand = function(cmd, adr=0, value=0) {
     sendMessage('{"CMD":"'+cmd+'", "ADR":"'+adr+'", "VL":"'+value+'"}')
 };
+

@@ -21,6 +21,7 @@ class Schn_Device(object):
         self.adr = 2
         self.indicators = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.connected: bool = False
+        self.enabled = False
 
 
     def write_console(self, mes):

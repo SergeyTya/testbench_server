@@ -1,16 +1,21 @@
 import datetime
+import io
 import json
 import multiprocessing
 # import termios
-#import termios
-
+import termios
+import ctypes
 import minimalmodbus
 import serial
 import time
 import serial as serialutil
 import mpch
 import schn
+import os
+import sys
+import subprocess
 
+libc = ctypes.CDLL(None)
 
 class Commands(object):
     MPCH_Get_AllHoldings = "MPCH_Get_AllHoldings"
@@ -28,7 +33,8 @@ class Commands(object):
     Schn_start = "Schn_start"
     Schn_stop =  "Schn_stop"
     Schn_reset = "Schn_reset"
-
+    Loader_write = "loader_write"
+    Loader_verify = "loader_verify"
 
 
 class TestBench(multiprocessing.Process):
@@ -38,9 +44,9 @@ class TestBench(multiprocessing.Process):
         self.taskQ = taskQ
         self.resultQ = resultQ
 
-        port = "/dev/ttyUSB0"
+        self.port = "/dev/ttyUSB0"
        # port = "COM7"
-        instrument = minimalmodbus.Instrument(port, 2)
+        instrument = minimalmodbus.Instrument(self.port, 2)
         instrument.serial.baudrate = 9600
         instrument.serial.bytesize = 8
         instrument.serial.parity = serial.PARITY_NONE
@@ -72,8 +78,49 @@ class TestBench(multiprocessing.Process):
             Commands.Schn_setMtrTorq: self.Schn.set_mtorque,
             Commands.Schn_reset: self.Schn.reset,
             Commands.Schn_start: self.Schn.start,
-            Commands.Schn_stop: self.Schn.stop
+            Commands.Schn_stop: self.Schn.stop,
+            Commands.Loader_write: self.loader_write,
+            Commands.Loader_verify: self.loader_verify
         }
+
+    def loader_write(self, value, **kwargs):
+        print()
+        path = os.getcwd()+'/temp_hex/'
+        os.system('rm -rf %s/*' % path)
+        os.system('touch %s/temp.hex' % path)
+        value = value.replace(',', '\n')
+        with open(path+'temp.hex', 'w') as f:
+            f.write(value)
+            f.close
+        proc = subprocess.Popen('./loader/main %s 9600 1 flash ./temp_hex/temp.hex' % self.port, shell=True,
+                                stdout=subprocess.PIPE)
+        s = ' '
+        while s:
+            s = proc.stdout.readline().decode('unicode_escape').rstrip()
+            print(s)
+            if s != '':
+                tmp_str = '{"bconsol" : {"value" : "%s"} }' % s
+                self.resultQ.put(tmp_str)
+
+
+    def loader_verify(self, value, **kwargs):
+        path = os.getcwd() + '/temp_hex/'
+        os.system('rm -rf %s/*' % path)
+        os.system('touch %s/temp.hex' % path)
+        value = value.replace(',', '\n')
+        with open(path + 'temp.hex', 'w') as f:
+            f.write(value)
+            f.close
+
+        proc = subprocess.Popen('./loader/main %s 9600 1 verify ./temp_hex/temp.hex' % self.port, shell=True,
+                                stdout=subprocess.PIPE)
+        s = ' '
+        while s:
+            s = proc.stdout.readline().decode('unicode_escape').rstrip()
+            print(s)
+            if s != '':
+                tmp_str = '{"bconsol" : {"value" : "%s"} }' % s
+                self.resultQ.put(tmp_str)
 
     def write_console(self, mes):
         tmp_str = 'Serial thread: %s' % mes
@@ -135,7 +182,7 @@ class TestBench(multiprocessing.Process):
         time.sleep(0.1)
         self.MPCH.getAllInputs()
         self.MPCH.getStatus()
-        self.Schn.get_indicators()
+        # self.Schn.get_indicators()
 
         if self.connection_error_count != self.MPCH.connection_error_count:
             self.connection_error_count = self.MPCH.connection_error_count
@@ -144,6 +191,12 @@ class TestBench(multiprocessing.Process):
 
         self.read_tasks()
 
-
-
-
+if __name__ == '__main__':
+    proc = subprocess.Popen('./loader/main /dev/ttyUSB1 9600 1 verify ./temp_hex/temp.hex', shell=True,
+                            stdout=subprocess.PIPE)
+    s = ' '
+    while s:
+        s = proc.stdout.readline()
+        # print(s)
+        s=s.rstrip().decode('UTF8')
+        print(s)

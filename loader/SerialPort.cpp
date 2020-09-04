@@ -101,7 +101,7 @@ void SerialPort::setPortName() {
 	this->name = "/dev/" + this->name;
 }
 
-int SerialPort::Open() {
+int SerialPort::Open(int bdr=0) {
 
 	struct termios tty;
 
@@ -123,15 +123,17 @@ int SerialPort::Open() {
 			return -1;
 		}
 
-		cout<<"	[0] 9600 "<<endl;
-		cout<<"	[1] 38400"<<endl;
-		cout<<"	[2] 115200"<<endl;
-		cout<<"	[3] 230400"<<endl;
-		cout<<"	[4] 406000"<<endl;
-		int i=-1;
+		int i = -1;
+		if(bdr ==  0){
+			cout << "	[0] 9600 " << endl;
+			cout << "	[1] 38400" << endl;
+			cout << "	[2] 115200" << endl;
+			cout << "	[3] 230400" << endl;
+			cout << "	[4] 406000" << endl;
 
-		while (i < 0 || i > 4) {
-				cout<<"Select speed ... ";
+
+			while (i < 0 || i > 4) {
+				cout << "Select speed ... ";
 				cin >> i;
 				if (std::cin.fail()) {
 					std::cin.clear();
@@ -139,6 +141,18 @@ int SerialPort::Open() {
 					std::cout << "Invalid input.  Please try again.\n";
 					i = -1;
 				}
+			}
+		}else{
+			i=0;
+			switch (bdr) {
+				case 9600:   i=0; break;
+				case 38400:  i=1; break;
+				case 115200: i=2; break;
+				case 230400: i=3; break;
+				case 406000: i=4; break;
+				default:
+					break;
+			}
 		}
 
 		int spd[5] = { B9600,  B38400, B115200, B230400, B460800 };
