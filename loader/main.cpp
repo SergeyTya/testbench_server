@@ -53,13 +53,19 @@ START:
 		cout<<"Mode: "<<argv[4]<<endl;
 		cout<<"file: "<<argv[5]<<endl;
 
-		bl.readHexFile(argv[5]);
-
 		Port.name = argv[1];
 
 		if (Port.Open(bdr) == -1) return 0;
 		bl.getModBusLoader(adr, true);
 		if(bl.getLoaderID()==-1) return 0;
+
+		if ( ((string) argv[4]).find("reset") == 0) {
+			cout << "RESETTING DEVICE!" << endl;
+			bl.restartDevice();
+	        return 0;
+			};
+
+		bl.readHexFile(argv[5]);
 
 		if ( ((string) argv[4]).find("flash") == 0) {
 			cout << "WRITING IMAGE TO DEVICE!" << endl;

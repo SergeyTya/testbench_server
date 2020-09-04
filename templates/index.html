@@ -420,10 +420,10 @@
 <!--выпадающий список bootloade-->
         <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Загрузчик МПЧ</button>
         <div class="panel"> <!--выпадающий список сравнить-->
-            <div id="bconsol" style="height: 75px; overflow-y: scroll !important;"> </div>
+            <div id="bconsol" style="height: 48px; overflow-y: scroll !important;"> </div>
             <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сравнить</button>
             <div class = panel>
-                <p>Файл прошивки в МПЧ будет сравниваться с данными в файле</p>
+                <span>Файл прошивки будет сравниваться с данными в памяти устройства &nbsp;&nbsp;&nbsp;</span>
                 <input type="file"  accept=".hex, .HEX" class="custom-file-input" id="verifyHex" onChange="
                     let files = document.getElementById('verifyHex').files;
                     file=files.item(0);
@@ -446,7 +446,7 @@
             </div>
             <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Прошить</button>
             <div class = panel>
-                <p>Файл прошивки в МПЧ будет сравниваться с данными в файле</p>
+                <span>Файл прошивки будет загружен в память устройства&nbsp;&nbsp;&nbsp;</span>
                 <input type="file"  accept=".hex, .HEX" class="custom-file-input" id="loadHex" onChange="
                     let files = document.getElementById('loadHex').files;
                     file=files.item(0);
@@ -467,6 +467,14 @@
 
                 "></br>
             </div>
+              <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Сброс МК</button>
+            <div class = panel>
+                <span>Устройство будет перезагружено&nbsp;&nbsp;&nbsp;</span>
+                   <button onclick="
+                     sendCommand('loader_reset');
+                "> Reset </button></br>
+            </div>
+
 
         </div>
     </p>

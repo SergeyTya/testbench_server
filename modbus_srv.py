@@ -35,6 +35,7 @@ class Commands(object):
     Schn_reset = "Schn_reset"
     Loader_write = "loader_write"
     Loader_verify = "loader_verify"
+    Loader_reset = "loader_reset"
 
 
 class TestBench(multiprocessing.Process):
@@ -44,7 +45,7 @@ class TestBench(multiprocessing.Process):
         self.taskQ = taskQ
         self.resultQ = resultQ
 
-        self.port = "/dev/ttyUSB0"
+        self.port = "/dev/ttyUSB1"
        # port = "COM7"
         instrument = minimalmodbus.Instrument(self.port, 2)
         instrument.serial.baudrate = 9600
@@ -80,19 +81,13 @@ class TestBench(multiprocessing.Process):
             Commands.Schn_start: self.Schn.start,
             Commands.Schn_stop: self.Schn.stop,
             Commands.Loader_write: self.loader_write,
-            Commands.Loader_verify: self.loader_verify
+            Commands.Loader_verify: self.loader_verify,
+            Commands.Loader_reset: self.loader_reset
         }
 
-    def loader_write(self, value, **kwargs):
-        print()
-        path = os.getcwd()+'/temp_hex/'
-        os.system('rm -rf %s/*' % path)
-        os.system('touch %s/temp.hex' % path)
-        value = value.replace(',', '\n')
-        with open(path+'temp.hex', 'w') as f:
-            f.write(value)
-            f.close
-        proc = subprocess.Popen('./loader/main %s 9600 1 flash ./temp_hex/temp.hex' % self.port, shell=True,
+    # run consol application with arguments
+    def loader_proc(self, cmd):
+        proc = subprocess.Popen('./loader/main %s 9600 1 %s ./temp_hex/temp.hex' % (self.port, cmd), shell=True,
                                 stdout=subprocess.PIPE)
         s = ' '
         while s:
@@ -102,25 +97,26 @@ class TestBench(multiprocessing.Process):
                 tmp_str = '{"bconsol" : {"value" : "%s"} }' % s
                 self.resultQ.put(tmp_str)
 
-
-    def loader_verify(self, value, **kwargs):
+    # writing hex data from socket to temp file
+    def loader_write_hex(self, data):
         path = os.getcwd() + '/temp_hex/'
         os.system('rm -rf %s/*' % path)
         os.system('touch %s/temp.hex' % path)
-        value = value.replace(',', '\n')
+        data = data.replace(',', '\n')
         with open(path + 'temp.hex', 'w') as f:
-            f.write(value)
+            f.write(data)
             f.close
 
-        proc = subprocess.Popen('./loader/main %s 9600 1 verify ./temp_hex/temp.hex' % self.port, shell=True,
-                                stdout=subprocess.PIPE)
-        s = ' '
-        while s:
-            s = proc.stdout.readline().decode('unicode_escape').rstrip()
-            print(s)
-            if s != '':
-                tmp_str = '{"bconsol" : {"value" : "%s"} }' % s
-                self.resultQ.put(tmp_str)
+    def loader_reset(self, **kwargs):
+        self.loader_proc("reset")
+
+    def loader_write(self, value, **kwargs):
+        self.loader_write_hex(value)
+        self.loader_proc("flash")
+
+    def loader_verify(self, value, **kwargs):
+        self.loader_write_hex(value)
+        self.loader_proc("verify")
 
     def write_console(self, mes):
         tmp_str = 'Serial thread: %s' % mes

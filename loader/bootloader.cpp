@@ -87,9 +87,9 @@ int bootloader::getModBusLoader(int adr=0, bool getLoader=false) {
 		return -1;
 	} else {
 		cout <<"ok"<<endl;
-		cout << "Device: " << str.substr(10, 8) << endl;
-		cout << "MCU   : " << str.substr(32, 10) << endl;
-		cout << "SW    : " << str.substr(44, 9) << endl;
+		cout << "Device: " << str.substr(10, 8)  << endl;
+		cout << "Info1 : " << str.substr(32, 10) << endl;
+		cout << "SW    : " << str.substr(44, 9)  << endl;
 	};
 
 	cout.flush();
