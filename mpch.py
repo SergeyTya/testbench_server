@@ -21,7 +21,8 @@ class MPCH_Device(object):
         self.slave_name = ""
         self.create_logfile()
         self.adr = 1
-        self.connected:bool = False
+        self.connected: bool = False
+        self.enabled: bool = False
 
         try:
             with open('status.json', 'r',
@@ -46,6 +47,7 @@ class MPCH_Device(object):
         return tmp_str
 
     def getAllHoldings(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         if not self.connected:
             self.get_slaveID()
@@ -66,6 +68,7 @@ class MPCH_Device(object):
             self.set_disconnected()
 
     def setOneHolding(self, adr, value, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         try:
             value = int(value)
@@ -90,6 +93,7 @@ class MPCH_Device(object):
 
 
     def getOneHolding(self, adr, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         if not self.connected: self.get_slaveID()
         try:
@@ -125,8 +129,15 @@ class MPCH_Device(object):
         self.resultQ.put(tmp_str)
         self.write_console(tmp_str)
         self.writeCmdLog(tmp_str)
+        tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
+        self.resultQ.put(tmp_str)
+        for el in self.inputs: el = 0
+        # if len(self.inputs) > 4: self.inputs[3] = 0
+        # tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
+        # self.resultQ.put(tmp_str)
 
     def getAllInputs(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         if not self.connected:
             self.get_slaveID()
@@ -155,6 +166,7 @@ class MPCH_Device(object):
 
 
     def refresh(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Refreshing MPCH device")
         self.slave_name = "нет устройства"
@@ -192,7 +204,10 @@ class MPCH_Device(object):
         self.writeCmdLog(tmp_str)
 
     def get_slaveID(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
+        tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
+        self.resultQ.put(tmp_str)
         try:
             req = self.instrument._perform_command(43, '\x0E\x01\x01\x00\x00')
             self.slave_name = req[8:16] + req[32:40] + req[44:52]
@@ -211,9 +226,21 @@ class MPCH_Device(object):
             self.connection_error_count = self.connection_error_count + 1
             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : MPCH :", e)
             self.write_console(str(e))
+            self.set_disconnected()
             return False
 
     def getStatus(self, **kwargs):
+
+        if not self.enabled:
+            tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
+            self.resultQ.put(tmp_str)
+            tmp_str = '{"MPCH_enable_state" : {"value" : "Отключен", "color": "red"}}'
+            self.resultQ.put(tmp_str)
+            return False
+
+        tmp_str = '{"MPCH_enable_state" : {"value" : "Включен", "color": "green"}}'
+        self.resultQ.put(tmp_str)
+
         tmp_str = ""
         if len(self.inputs) > 2:
             str_status = str(hex(self.inputs[2]))
@@ -224,7 +251,10 @@ class MPCH_Device(object):
             except (
                     KeyError,
                     IndexError
-            ): str_status2 = str_status
+            ):
+                print("MPCH getstatus key error")
+                str_status2 = str_status
+                tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % " нет устройства "
         else:
             tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % " нет устройства "
             self.resultQ.put(tmp_str)
@@ -260,6 +290,17 @@ class MPCH_Device(object):
         if self.logfileCmd != "":
             self.logfileCmd.write(datetime.datetime.now().strftime("%d/%m/%Y-%H.%M.%S") + " : " + msg + '\n')
             self.logfileCmd.flush()
+
+    def set_enable(self, **kwargs):
+        self.enabled = True
+        tmp_str = '{"MPCH_enable_state" : {"value" : "Включен", "color": "green"}}'
+        self.resultQ.put(tmp_str)
+        self.refresh()
+
+    def set_disable(self, **kwargs):
+        self.enabled = False
+        tmp_str = '{"MPCH_enable_state" : {"value" : "Отключен", "color": "red"}}'
+        self.resultQ.put(tmp_str)
 
 
 if __name__ == '__main__':

@@ -44,6 +44,7 @@ class Schn_Device(object):
     def get_indicators(self):
         self.instrument.address = self.adr
         self.get_status()
+        if not self.enabled: return
         if not self.connected:
             self.get_slaveID()
             if not self.connected: return
@@ -75,6 +76,7 @@ class Schn_Device(object):
             self.set_disconnected()
 
     def refresh(self, **kwargs):
+        if not self.enabled: return
         self. instrument.address = self.adr
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Refreshing ATV71 device")
         self.slave_name = "нет устройства"
@@ -105,31 +107,45 @@ class Schn_Device(object):
         self.connected: bool = False
         tmp_str = '{"Schn_ID" : {"value" : "%s"} }' % self.slave_name
         self.resultQ.put(tmp_str)
-
         self.write_console(tmp_str)
 
+    def set_enable(self, **kwargs):
+        self.enabled = True
+        tmp_str = '{"Schn_enable_state" : {"value" : "Включен", "color": "green"}}'
+        self.resultQ.put(tmp_str)
+
+    def set_disable(self, **kwargs):
+        self.enabled = False
+        tmp_str = '{"Schn_enable_state" : {"value" : "Отключен", "color": "red"}}'
+        self.resultQ.put(tmp_str)
+
     def start(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "ATV71 start")
         self.instrument.write_register(8601, 0x1 + 0x8)
 
     def stop(self, **kwargs):
+        if not self.enabled: return
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "ATV71 stop")
         self.instrument.address = self.adr
         self.instrument.write_register(8501, 0)
 
     def reset(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "ATV71 fault reset")
         self.instrument.write_register(8501, 0x00)
         self.instrument.write_register(8501, 0x80)
 
     def revers(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "ATV71 revers")
         self.instrument.write_register(8501, 2048)
 
     def set_freq(self, value,  **kwargs):
+        if not self.enabled: return
         try:
             value = int(value)
         except ValueError:
@@ -138,6 +154,7 @@ class Schn_Device(object):
         self.instrument.write_register(8502, value, signed=True)
 
     def set_gtorque(self, value,  **kwargs):
+        if not self.enabled: return
         try:
             value = int(value)
         except ValueError:
@@ -149,6 +166,7 @@ class Schn_Device(object):
 
 
     def set_mtorque(self, value,  **kwargs):
+        if not self.enabled: return
         try:
             value = int(value)
         except ValueError:
@@ -157,7 +175,14 @@ class Schn_Device(object):
         self.instrument.write_register(9211, value)
 
     def get_status(self,  **kwargs):
-        # if self.dev_status == 0xFFFF: return ""
+
+        if not self.enabled:
+            tmp_str = '{"Schn_St" : {"value" : "нет связи", "color": "gray"}}'
+            self.resultQ.put(tmp_str)
+            tmp_str = '{"Schn_enable_state" : {"value" : "Отключен", "color": "red"}}'
+            self.resultQ.put(tmp_str)
+            return False
+
         atv_state = [
             'Ready to ON', 'Swithed ON', 'Oper enbl1', 'Fault',
             'Vltg dsbl', 'Quick stop', 'Switch on dsbl', 'Alarm',
@@ -185,6 +210,7 @@ class Schn_Device(object):
         return strng
 
     def get_slaveID(self, **kwargs):
+        if not self.enabled: return
         self.instrument.address = self.adr
         self.slave_name = "disconnected"
         try:

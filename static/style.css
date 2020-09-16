@@ -127,6 +127,18 @@ font-family: 'Open Sans', verdana, arial, sans-serif;
     transition: opacity .2s;
 }
 
+.slider_switch {
+    -webkit-appearance: none;
+    width: 20%;
+    height: 30px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    align: center;
+}
+
 .slider:hover {
     opacity: 1;
 }

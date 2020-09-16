@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Стенд 5.5 кВт</title>
-    <link rel="stylesheet" href="{{ static_url("style.css")}}">
+    <link rel="stylesheet" href="{{ static_url('style.css')}}">
     <p style="
         color: #69808B;
         text-align:center;
@@ -59,34 +59,70 @@
 
         <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
         <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
+        <!--    Лог-->
+        <a href = {{logfile.name}} target="_blank" style="color:#F97400;"> Посмотреть лог </a>
     </div>
-<!-- Статус -->
-    <div>
+    </br>
+    <!--Таблица с информацией -->
+    <table align="right" width="100%" valign="bottom"  style=" background-color:#272C2F;color: #909091; font-family:'Open Sans', verdana, arial, sans-serif">
+        <!-- Статус МПЧ-->
+        <tr>
+            <td valign="middle" >
+                <span>МПЧ ID:</span> <span ID="MPCH_ID">нет устройства</span><input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+                                tmp = document.getElementById('MPCH_ID')
+                                tmp.innerHTML='обновление'
+                                sendCommand('MPCH_reconnect')
+                                sendCommand('MPCH_Get_SlaveID') "/>
+                <span> &nbsp; &nbsp; &nbsp;</span>
+            </td>
+            <td align="right" width="300px">
+                <input type="range" class="slider_switch" min="0" max="1" value="0" step="1" id = 'Mpch_enable' width = "15%"
+                onchange="if(this.value == '0'){sendCommand('MPCH_disable');}else {sendCommand('MPCH_enable');}">
+            </td>
+            <td align="left">
+                <span id = 'MPCH_enable_state' style='vertical-align: bottom;  height: 100px; width: 100%; color: white'>Отключен</span>
+            </td>
+        </tr>
+        <tr> <td> <span>МПЧ код статуса: </span>   <span id={{"plotlyIndi"+str(0)}}> 0 <span> </span></span> </td></tr>
+        <tr> <td> <span>МПЧ ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span> </td></tr>
+        <!--    Статус Шнайдера-->
+        <tr>
+            <td valign="middle" >
+                <span>Schneider ID: </span>  <span ID="Schn_ID">нет устройства</span>
+                <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
+                                    tmp = document.getElementById('Schn_ID')
+                                    tmp.innerHTML='обновление'
+                                    sendCommand('Schn_reconnect')
+                                    sendCommand('Schn_getID') "/>
+                <span> &nbsp; &nbsp; &nbsp;</span>
+            </td>
+            <td align="right" width="300px">
+                <input type="range" class="slider_switch" min="0" max="1" value="0" step="1" id = 'Schn_enable' width = "15%"
+                       onchange="if(this.value == '0'){sendCommand('Schn_disable');}else {sendCommand('Schn_enable');}">
+            </td>
+            <td align="left">
+                <span id = 'Schn_enable_state' style='vertical-align: bottom;  height: 100px; width: 100%; color: white'>Отключен</span>
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp; &nbsp; &nbsp;</p>
+    <div> <!--блок выпадающих списков-->
+        <!--выпадающий список управление МПЧ-->
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление МПЧ</button>
+        <div class="panel"> <!--выпадающий список управление-->
+            <div>
 <!--    Цифровые индикаторы        -->
-          <div style=" background-color:#272C2F;color: #909091; font-family:'Open Sans', verdana, arial, sans-serif">
-              <p style = "background-color: #272C2F; color: #D4D4D4; padding: 5px; text-align: left;text-decoration: underline;font-size: 18px;"> Индикаторы МПЧ </p>
-              <span>ID устройства:</span> <span ID="MPCH_ID">нет устройства</span><input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
-                 tmp = document.getElementById('MPCH_ID')
-                 tmp.innerHTML='обновление'
-                 sendCommand('MPCH_reconnect')
-                 sendCommand('MPCH_Get_SlaveID') "/></br>
-              <span>Код статуса: </span>   <span id={{"plotlyIndi"+str(0)}}> 0 <span> </span></span></br>
-              <span>Ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span></br>
-              <a href = {{logfile.name}} target="_blank" style="color:#F97400;"> Посмотреть лог </a>
-         </div>
-
             <table style="font-size: 10px; margin:10 auto" align="center">
 
                 <tr>
                     <td colspan="3"><div ID="MPCH_Status" style="
-                text-align:center;
-                margin:10 auto;
-                font-size: 32px;
-                font-family: 'Open Sans', verdana, arial, sans-serif;
-                font-weight: bold;
-                background-color:#272C2F;
-                padding: 5px;
-             ">  нет соединения  </div></td>
+                    text-align:center;
+                    margin:10 auto;
+                    font-size: 32px;
+                    font-family: 'Open Sans', verdana, arial, sans-serif;
+                    font-weight: bold;
+                    background-color:#272C2F;
+                    padding: 5px; ">  нет соединения  </div></td>
                 </tr>
 
                 <tr><td align="right" width="200"><table style=" display: inline-block; background: #272C2F;">
@@ -126,19 +162,16 @@
                         onclick="window.open('/statistics');"
                         >0.0</td></tr></table></td>
                 </tr>
-            </table>
-    </div>
-    <div> <!--блок выпадающих списков-->
-        <!--выпадающий список управление-->
-        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление МПЧ</button>
-        <div class="panel"> <!--выпадающий список управление-->
+                </table>
+            </div>
+        <!--Управление МПЧ -->
         <div><table border="0" cellpadding="5" cellspacing="0" align="center">  <!--таблица с элементами управления-->
-            <tr> <!--Регуляторы--> <!--    Регулятор  частоты МПЧ       -->
+             <tr>  <!--    Регулятор  частоты МПЧ       -->
                 <td colspan="3" ><p style = "font-size: 18px;" >Задание частоты</p></td>
-            </tr>
+             </tr>
              <tr>
-                <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id="MPCH_FreqCntrl"
-                onchange="
+                <td colspan="2"><input type="range" align="center" class="slider" min="0" max="1000" value="0" step="1" id="MPCH_FreqCntrl"
+                                       onchange="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
                         if(val==null) return;
                         tmp = Number(val*this.value/1000).toFixed(0);
@@ -146,7 +179,7 @@
                         sendCommand('MPCH_Get_OneHolding',3, 0);
                         set_value_by_id('MPCH_FRI', (tmp*0.1).toFixed(1), 'red');
                 "
-                oninput="
+                                       oninput="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
                         if(val==null) return;
                         tmp = Number(val*this.value*0.001);
@@ -157,8 +190,8 @@
              <tr> <!--    Регулятор  направления МПЧ       -->
                 <td colspan="3"><p style = "font-size: 18px;" >Направление вращения</p></td></tr>
              <tr>
-             <tr><td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1"  value="0" step="1" id="MPCH_DirCntrl"
-                onchange="
+             <tr><td colspan="2"><input type="range" align="center" class="slider" min="0" max="1" value="0" step="1" id="MPCH_DirCntrl"
+                                        onchange="
                         if(this.value == 1)set_value_by_id('MPCH_FDI', 'Обратное', 'red');
                         if(this.value == 0)set_value_by_id('MPCH_FDI', 'Прямое', 'red');
                         sendCommand('MPCH_Set_OneHolding',4, this.value);
@@ -182,11 +215,9 @@
                     </button>
                 </td>
             </tr>
-
         </table></div>
-    </div>
 
-<!--выпадающий список регистров хранения-->
+            <!--выпадающий список регистров хранения-->
 <!--<button class= "accordion" onclick="OnHoldingPanelOpen(this,'input')">Индикаторы</button>-->
 <!--<div class="panel">-->
 <!--        {% for i in range(len(input_names)) %}-->
@@ -196,6 +227,7 @@
 <!--        </p>-->
 <!--        {% end %}-->
 <!--</div>-->
+    </div>
 
 <!--выпадающий список регистров ввода-->
         <button class="accordion" onclick="OnHoldingPanelOpen(this,'holding_value')">Параметры МПЧ</button>
@@ -330,21 +362,8 @@
             </div>
         </div>
 <!--выпадающий список управление нагрузкой-->
-        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')">Управление нагрузкой</button>
+        <button class="accordion" onclick="OnHoldingPanelOpen(this, '')"> Управление нагрузкой </button>
         <div class="panel">
-            <div style="
-                    margin: 5px;
-                   // background-color:#272C2F;
-                   // color: #909091;
-                    font-family:'Open Sans', verdana, arial, sans-serif">
-                <span>ID устройства:</span> <span ID="Schn_ID">нет устройства</span>
-                <input type="image" src={{static_url('img/refresh.png')}} height="15"  onclick="
-                     tmp = document.getElementById('Schn_ID')
-                     tmp.innerHTML='обновление'
-                     sendCommand('Schn_reconnect')
-                     sendCommand('Schn_getID') "/></br>
-            </div>
-
             <table style=" background: #272C2F; font-size: 24px;"  align="center" >
                 <tr > <!--    Цифровые индикаторы        -->
                     <td align="right" width="300">
@@ -477,7 +496,7 @@
 
 
         </div>
-    </p>
+    </div>
 </body>
 <footer>
 <!--    <p>powered by SergeyTyagus</p>-->

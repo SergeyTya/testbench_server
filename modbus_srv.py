@@ -15,8 +15,6 @@ import os
 import sys
 import subprocess
 
-libc = ctypes.CDLL(None)
-
 class Commands(object):
     MPCH_Get_AllHoldings = "MPCH_Get_AllHoldings"
     MPCH_Get_OneHolding = "MPCH_Get_OneHolding"
@@ -25,6 +23,8 @@ class Commands(object):
     MPCH_Set_OneHolding = "MPCH_Set_OneHolding"
     MPCH_saveToFile = "MPCH_saveToFile"
     MPCH_reconnect = "MPCH_reconnect"
+    MPCH_enable = "MPCH_enable"
+    MPCH_disable = "MPCH_disable"
     Schn_getID = "Schn_getID"
     Schn_reconnect = "Schn_reconnect"
     Schn_setGenTorq = "Schn_setGenTorq"
@@ -33,6 +33,8 @@ class Commands(object):
     Schn_start = "Schn_start"
     Schn_stop =  "Schn_stop"
     Schn_reset = "Schn_reset"
+    Schn_enable = "Schn_enable"
+    Schn_disable = "Schn_disable"
     Loader_write = "loader_write"
     Loader_verify = "loader_verify"
     Loader_reset = "loader_reset"
@@ -72,6 +74,8 @@ class TestBench(multiprocessing.Process):
             Commands.MPCH_Set_OneHolding: self.MPCH.setOneHolding,
             Commands.MPCH_saveToFile: self.MPCH.saveToFile,
             Commands.MPCH_reconnect: self.MPCH.refresh,
+            Commands.MPCH_enable: self.MPCH.set_enable,
+            Commands.MPCH_disable: self.MPCH.set_disable,
             Commands.Schn_getID: self.Schn.get_slaveID,
             Commands.Schn_reconnect: self.Schn.refresh,
             Commands.Schn_setGenTorq: self.Schn.set_gtorque,
@@ -80,6 +84,8 @@ class TestBench(multiprocessing.Process):
             Commands.Schn_reset: self.Schn.reset,
             Commands.Schn_start: self.Schn.start,
             Commands.Schn_stop: self.Schn.stop,
+            Commands.Schn_enable: self.Schn.set_enable,
+            Commands.Schn_disable: self.Schn.set_disable,
             Commands.Loader_write: self.loader_write,
             Commands.Loader_verify: self.loader_verify,
             Commands.Loader_reset: self.loader_reset
@@ -178,7 +184,7 @@ class TestBench(multiprocessing.Process):
         time.sleep(0.1)
         self.MPCH.getAllInputs()
         self.MPCH.getStatus()
-        # self.Schn.get_indicators()
+        self.Schn.get_indicators()
 
         if self.connection_error_count != self.MPCH.connection_error_count:
             self.connection_error_count = self.MPCH.connection_error_count
