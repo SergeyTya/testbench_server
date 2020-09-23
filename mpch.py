@@ -17,7 +17,7 @@ class MPCH_Device(object):
         self.connection_error_count = 0
         self.dev_status = ""
         self.holdings = []
-        self.inputs = []
+        self.inputs: list = []
         self.slave_name = ""
         self.create_logfile()
         self.adr = 1
@@ -123,7 +123,7 @@ class MPCH_Device(object):
             self.set_disconnected()
 
     def set_disconnected(self):
-        self.slave_name = "disconnected"
+        self.slave_name = "нет устройства"
         self.connected: bool = False
         tmp_str = '{"MPCH_ID" : {"value" : "%s"} }' % self.slave_name
         self.resultQ.put(tmp_str)
@@ -131,7 +131,7 @@ class MPCH_Device(object):
         self.writeCmdLog(tmp_str)
         tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
         self.resultQ.put(tmp_str)
-        for el in self.inputs: el = 0
+        for el in self.inputs: el =0
         # if len(self.inputs) > 4: self.inputs[3] = 0
         # tmp_str = '{"MPCH_Status" : {"value" : "нет связи", "color": "gray"}}'
         # self.resultQ.put(tmp_str)
@@ -140,8 +140,12 @@ class MPCH_Device(object):
         if not self.enabled: return
         self.instrument.address = self.adr
         if not self.connected:
+            if len(self.inputs): self.inputs[2] = 0
+            tmp = self.createRegReq(["MPCH_ireg"] * len(self.inputs), self.inputs[2:], range(7))
+            self.resultQ.put(tmp)
             self.get_slaveID()
             if not self.connected: return
+
         try:
             if not self.connected: self.get_slaveID()
             if len(self.inputs) < 3: return

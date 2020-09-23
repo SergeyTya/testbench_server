@@ -68,6 +68,7 @@ class app(tornado.web.Application):
                 holding_names=app.holding_names,
                 logfile=app.logfileCmd,
                 schn_iname=schn.schn_iname
+
             )
 
     class SaveMpchParamHandler(tornado.web.RequestHandler):
