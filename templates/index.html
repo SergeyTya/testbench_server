@@ -66,10 +66,10 @@
         color: #909091;
         font-family:'Open Sans', verdana, arial, sans-serif">
 
-        <span>В работе:</span> <span ID="MPCH_LiveTime"> 0 <span> мин </span></span></br>
-        <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>
+        <span>В работе:</span> <span ID="LiveTime"> 0 <span> мин </span></span></br>
+<!--        <span>Всего пакетов:</span> <span ID="MPCH_ConCnt"> 0 <span> </span></span></br>-->
         <!--    Лог-->
-        <a href = {{logfile.name}} target="_blank" style="color:#F97400;"> Посмотреть лог </a>
+        <a href = {{logfile}} target="_blank" style="color:#F97400;"> Посмотреть лог </a>
     </div>
     </br>
     <!--Таблица с информацией -->
@@ -92,6 +92,8 @@
                 <span id = 'MPCH_enable_state' style='vertical-align: bottom;  height: 100px; width: 100%; color: white'>Отключен</span>
             </td>
         </tr>
+        <tr> <td> <span>МПЧ под нагрузкой:   </span>   <span id='MPCH_onloadtime'> 0 мин 0 сек <span> </span></span> </td></tr>
+        <tr> <td> <span>МПЧ под напряжением: </span>   <span id='MPCH_lifetime'> 0 мин 0 сек <span> </span></span> </td></tr>
         <tr> <td> <span>МПЧ код статуса: </span>   <span id={{"plotlyIndi"+str(0)}}> 0 <span> </span></span> </td></tr>
         <tr> <td> <span>МПЧ ошибок связи: </span>  <span ID="MPCH_ConErr"> 0 <span> </span></span> </td></tr>
         <!--    Статус Шнайдера-->

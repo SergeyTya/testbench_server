@@ -1,6 +1,7 @@
 import datetime
 import json
 import multiprocessing
+import time
 
 import tornado.web
 import tornado.httpserver
@@ -26,6 +27,7 @@ class app(tornado.web.Application):
     resultQ = multiprocessing.Queue()
     logfileIndic = ""
     logfileCmd = ""
+    time_now = time.monotonic()
 
     def __init__(self):
         handlers = [

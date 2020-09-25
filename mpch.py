@@ -23,6 +23,9 @@ class MPCH_Device(object):
         self.adr = 1
         self.connected: bool = False
         self.enabled: bool = False
+        self.onload: bool = False
+        self.onloadtime = 0
+        self.lifetime = 0
 
         try:
             with open('status.json', 'r',
@@ -248,6 +251,7 @@ class MPCH_Device(object):
         tmp_str = ""
         if len(self.inputs) > 2:
             str_status = str(hex(self.inputs[2]))
+            self.onload = (str_status[2:3] == "3") & self.connected
             try:
                 str_status2 = " " + self.satus_list[0][str_status[2:3]][0]+" "+self.satus_list[1][str_status[3:5]]
                 tmp_str = '{"MPCH_Status" : {"value" : "%s" , "color":"%s"} }' \
@@ -289,6 +293,9 @@ class MPCH_Device(object):
         except FileNotFoundError: pass
         self.logfileIndic = open('static/log/' + name1, 'x')
         self.logfileCmd = open('static/log/' + name2, 'x')
+        self.resultQ.put('{"MPCH_Indilogfile" : {"value" : "%s"}}' % self.logfileIndic.name)
+        self.resultQ.put('{"MPCH_Cmdlogfile"  : {"value" : "%s"}}' % self.logfileCmd.name)
+        print("new log file: ", self.logfileIndic.name)
 
     def writeCmdLog(self, msg):
         if self.logfileCmd != "":
@@ -303,8 +310,29 @@ class MPCH_Device(object):
 
     def set_disable(self, **kwargs):
         self.enabled = False
+        self.connected = False
+        self.onload = False
         tmp_str = '{"MPCH_enable_state" : {"value" : "Отключен", "color": "red"}}'
         self.resultQ.put(tmp_str)
+
+    def get_times(self, delta=1):
+        if self.connected:
+            self.lifetime = self.lifetime + delta
+        else:
+            self.lifetime = 0
+        if self.onload:
+            self.onloadtime = self.onloadtime + delta
+        else:
+            self.onloadtime = 0
+
+        minute = int(self.onloadtime / 60)
+        seconds = int(self.onloadtime - minute * 60)
+        self.resultQ.put('{"MPCH_onloadtime"  : {"value" : "%s мин %s сек"}}' % (minute, seconds))
+        minute = int(self.lifetime / 60)
+        seconds = int(self.lifetime - minute * 60)
+        self.resultQ.put('{"MPCH_lifetime"    : {"value" : "%s мин %s сек"}}' % (minute, seconds))
+
+
 
 
 if __name__ == '__main__':

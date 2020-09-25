@@ -43,6 +43,8 @@ class Commands(object):
 class TestBench(multiprocessing.Process):
 
     def __init__(self, taskQ, resultQ):
+
+        self.startTime = time.monotonic()
         multiprocessing.Process.__init__(self)
         self.taskQ = taskQ
         self.resultQ = resultQ
@@ -177,11 +179,18 @@ class TestBench(multiprocessing.Process):
             #     self.write_console("Unexpected error")
             #     self.MPCH.devices = []
 
+    def sec_count(self):
+        timenow = time.monotonic()
+        delta = int(timenow - self.startTime)
+        if delta > 9:
+            self.startTime = timenow
+            return delta
+        return 0
+
     def proc(self):
-        tmp_str = '{"MPCH_ConCnt" : {"value" : "%d"} }' % self.cnt
-        self.resultQ.put(tmp_str)
-        self.cnt = self.cnt + 1
-        time.sleep(0.1)
+        delta = self.sec_count()
+        if delta > 0: self.MPCH.get_times(delta=delta)
+        time.sleep(0.5)
         self.MPCH.getAllInputs()
         self.MPCH.getStatus()
         self.Schn.get_indicators()

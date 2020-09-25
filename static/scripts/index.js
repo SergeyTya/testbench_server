@@ -29,6 +29,8 @@ var bconsol_count = 0;
 
 socket.onmessage = function (message) {
 
+    console.log(message)
+
     let dict
     try {
         dict = JSON.parse(message.data);
