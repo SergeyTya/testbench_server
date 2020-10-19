@@ -49,7 +49,7 @@ class TestBench(multiprocessing.Process):
         self.taskQ = taskQ
         self.resultQ = resultQ
 
-        self.port = "/dev/ttyUSB1"
+        self.port = "/dev/ttyUSB0"
        # port = "COM7"
         instrument = minimalmodbus.Instrument(self.port, 2)
         instrument.serial.baudrate = 9600

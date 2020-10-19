@@ -8,6 +8,12 @@ import serial
 import serial as serialutil
 import time
 
+
+
+# To setup modbus control
+#  COMMAND -> PROFILE="i/o propfile" and select modbus
+
+
 schn_iname = ['Speed, rmp', 'Current, A', 'Torque, %', 'Volt, V', '5', '6', '7', '8', '9']
 
 class Schn_Device(object):
@@ -197,6 +203,7 @@ class Schn_Device(object):
         # for i in range(16):
         #     if bnr[i] == "1": strng = strng + atv_state[15-i] + " " + str(i) + "; "
         # tmp_str = '{"Schn_St" : {"value" : "%s"} }' % strng
+        # print(tmp_str)
 
         if bnr[14] == '1': tmp_str = '{"Schn_St" : {"value" : "Остановлен" , "color": "blue"} }'
         if bnr[13] == '1': tmp_str = '{"Schn_St" : {"value" : "Работа" , "color": "green"} }'

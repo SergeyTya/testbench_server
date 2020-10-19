@@ -51,9 +51,14 @@ if __name__ == "__main__":
             for c in tornado_srv.app.clients:
                 c.write_message(result)
 
+    def scenario__control():
+        pass
+
     mainLoop = tornado.ioloop.IOLoop.instance()
-    scheduler = tornado.ioloop.PeriodicCallback(modbus_listener, 10)
-    scheduler.start()
+    modbus = tornado.ioloop.PeriodicCallback(modbus_listener, 10)
+    scenario = tornado.ioloop.PeriodicCallback(scenario__control, 100)
+    scenario.start()
+    modbus.start()
     mainLoop.start()
 
 

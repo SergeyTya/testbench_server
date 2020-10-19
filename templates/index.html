@@ -426,7 +426,7 @@
                 <!--    Регулятор момента в ген. режиме       -->
                 <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в генераторном режиме</p></td></tr>
                 <tr>
-                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id = Schn_GenTrqRng
+                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="2500"  value="0" step="1" id = Schn_GenTrqRng
                                onchange="sendCommand('Schn_setGenTorq', 0, this.value);  set_value_by_id('SchnI4', (this.value/10).toString(), 'red');"
                                oninput=" set_value_by_id('SchnI4', (this.value/10).toString(), 'blue'); "
                     ></td>
@@ -435,7 +435,7 @@
                 <!--    Регулятор момента в мотор. режиме       -->
                 <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в двигательном режиме</p></td></tr>
                 <tr>
-                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="1000"  value="0" step="1" id = Schn_MtrTrqRng
+                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="2500"  value="0" step="1" id = Schn_MtrTrqRng
                                onchange="sendCommand('Schn_setMtrTorq', 0, this.value); set_value_by_id('SchnI5', (this.value/10).toString(), 'red');"
                                oninput=" set_value_by_id('SchnI5', (this.value/10).toString(), 'blue'); "
                     ></td>
