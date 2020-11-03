@@ -4,6 +4,7 @@ from threading import Timer
 
 import modbus_srv
 import tornado_srv
+import scenario
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -19,6 +20,7 @@ if __name__ == "__main__":
     mbs = modbus_srv.TestBench(tornado_srv.app.taskQ, tornado_srv.app.resultQ)
     mbs.daemon = True
     mbs.start()
+    scn = scenario.Scenario(mbs)
 
 
     tornado.options.parse_command_line()
@@ -52,7 +54,7 @@ if __name__ == "__main__":
                 c.write_message(result)
 
     def scenario__control():
-        pass
+        scn.run()
 
     mainLoop = tornado.ioloop.IOLoop.instance()
     modbus = tornado.ioloop.PeriodicCallback(modbus_listener, 10)
