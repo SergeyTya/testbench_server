@@ -1,4 +1,6 @@
 import multiprocessing
+import socket
+
 import time
 from threading import Timer
 
@@ -15,8 +17,23 @@ import datetime
 import json
 from threading import Thread
 
+
+def getNetworkIp():
+    try:
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.connect(('<broadcast>', 0))
+
+        return s.getsockname()[0]
+
+    except OSError:
+        return "localhost"
+
 if __name__ == "__main__":
 
+    ip_adr = getNetworkIp()
+    tornado_srv.app.my_ip = ip_adr
     mbs = modbus_srv.TestBench(tornado_srv.app.toDeviceQ, tornado_srv.app.toServerQ)
     mbs.daemon = True
     mbs.start()
@@ -25,8 +42,10 @@ if __name__ == "__main__":
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(tornado_srv.app())
     http_server.listen(options.port)
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Listening on port:", options.port)
+
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "Listening %s on port: %s" % (ip_adr, options.port))
     time_start = time.monotonic()
+
 
     def modbus_listener():
 

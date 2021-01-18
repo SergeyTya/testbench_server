@@ -29,6 +29,7 @@ class app(tornado.web.Application):
     logfileIndic = ""
     logfileCmd = ""
     time_now = time.monotonic()
+    my_ip = "localhost"
 
     def __init__(self):
         handlers = [
@@ -70,7 +71,8 @@ class app(tornado.web.Application):
                 input_names=app.input_names,
                 holding_names=app.holding_names,
                 logfile=app.logfileCmd,
-                schn_iname=schn.schn_iname
+                schn_iname=schn.schn_iname,
+                my_ip=app.my_ip
 
             )
 

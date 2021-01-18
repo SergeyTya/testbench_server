@@ -1,11 +1,9 @@
 
-//var socket = new WebSocket("ws://192.168.1.248:8080/ws");
-// var socket = new WebSocket("ws://192.168.1.196:8080/ws"); // PiOne wifi
-var socket = new WebSocket("ws://localhost:8080/ws");
-//var socket = new WebSocket("ws://192.168.178.138:8080/ws"); //WM
+var socket = new WebSocket("ws://"+ document.getElementById("Server_IP").innerHTML+ ":8080/ws");
 
 socket.onopen = function(){
     console.log("connected");
+
 };
 
 function set_value_by_id(ID, value , color){
