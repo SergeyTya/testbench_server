@@ -23,8 +23,9 @@ class app(tornado.web.Application):
     clients = []
     input_names = []
     holding_names = []
-    taskQ = multiprocessing.Queue()
-    resultQ = multiprocessing.Queue()
+    toDeviceQ = multiprocessing.Queue()
+    toServerQ = multiprocessing.Queue()
+    toScenarioQ = multiprocessing.Queue()
     logfileIndic = ""
     logfileCmd = ""
     time_now = time.monotonic()
@@ -97,14 +98,14 @@ class app(tornado.web.Application):
             tmp = '{"CMD":"%s"}'
             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " : ", "new connection", id(self))
             app.clients.append(self)
-            app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_AllHoldings)
-            app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_SlaveID)
-            app.taskQ.put(tmp % modbus_srv.Commands.MPCH_Get_Status)
-            app.taskQ.put(tmp % modbus_srv.Commands.Schn_getID)
+            app.toDeviceQ.put(tmp % modbus_srv.Commands.MPCH_Get_AllHoldings)
+            app.toDeviceQ.put(tmp % modbus_srv.Commands.MPCH_Get_SlaveID)
+            app.toDeviceQ.put(tmp % modbus_srv.Commands.MPCH_Get_Status)
+            app.toDeviceQ.put(tmp % modbus_srv.Commands.Schn_getID)
 
         def on_message(self, message):
             #self.write_message('got message! ' + message )
-            app.taskQ.put(message)
+            app.toDeviceQ.put(message)
 
 
         def on_close(self):

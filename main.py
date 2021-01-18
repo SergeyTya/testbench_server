@@ -17,11 +17,10 @@ from threading import Thread
 
 if __name__ == "__main__":
 
-    mbs = modbus_srv.TestBench(tornado_srv.app.taskQ, tornado_srv.app.resultQ)
+    mbs = modbus_srv.TestBench(tornado_srv.app.toDeviceQ, tornado_srv.app.toServerQ)
     mbs.daemon = True
     mbs.start()
-    scn = scenario.Scenario(mbs)
-
+    # scena = scenario.Scenario()
 
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(tornado_srv.app())
@@ -35,10 +34,19 @@ if __name__ == "__main__":
             tornado_srv.app.time_now = time.monotonic()
             livemin = int((time.monotonic() - time_start)/60)
             livesec = int(time.monotonic() - time_start - 60 * livemin)
-            tornado_srv.app.resultQ.put('{"LiveTime"  : {"value" : "%s мин %s сек"}}' % (livemin, livesec))
+            tornado_srv.app.toServerQ.put('{"LiveTime"  : {"value" : "%s мин %s сек"}}' % (livemin, livesec))
 
-        if not tornado_srv.app.resultQ.empty():
-            result = tornado_srv.app.resultQ.get()
+        if not tornado_srv.app.toServerQ.empty():
+            result = tornado_srv.app.toServerQ.get()
+
+            # # processing scenario
+            # scena.readDeviceToServerMessage(result)
+            # if not scena.toDeviceList.empty():
+            #     tornado_srv.app.toDeviceQ.put(scena.toDeviceList.get())
+            # if not scena.toServerList.empty():
+            #     tornado_srv.app.toServerQ.put(scena.toServerList.get())
+            # if not tornado_srv.app.toScenarioQ.empty():
+            #     scena.readServerToScenarioMessage(tornado_srv.app.toScenarioQ.get())
 
             try:
                 tmp = json.loads(result)
@@ -53,13 +61,8 @@ if __name__ == "__main__":
             for c in tornado_srv.app.clients:
                 c.write_message(result)
 
-    def scenario__control():
-        scn.run()
-
     mainLoop = tornado.ioloop.IOLoop.instance()
-    modbus = tornado.ioloop.PeriodicCallback(modbus_listener, 10)
-    scenario = tornado.ioloop.PeriodicCallback(scenario__control, 100)
-    scenario.start()
+    modbus   = tornado.ioloop.PeriodicCallback(modbus_listener, 10)
     modbus.start()
     mainLoop.start()
 

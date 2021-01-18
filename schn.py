@@ -205,7 +205,7 @@ class Schn_Device(object):
         # tmp_str = '{"Schn_St" : {"value" : "%s"} }' % strng
         # print(tmp_str)
 
-        if bnr[14] == '1': tmp_str = '{"Schn_St" : {"value" : "Остановлен" , "color": "blue"} }'
+        if bnr[14] == '1': tmp_str = '{"Schn_St" : {"value" : "Готов" , "color": "blue"} }'
         if bnr[13] == '1': tmp_str = '{"Schn_St" : {"value" : "Работа" , "color": "green"} }'
         if bnr[12] == '1': tmp_str = '{"Schn_St" : {"value" : "Авария", "color": "red"} }'
         if not self.connected: tmp_str = '{"Schn_St" : {"value" : "нет связи", "color": "gray"}}'
