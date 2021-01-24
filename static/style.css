@@ -160,3 +160,10 @@ font-family: 'Open Sans', verdana, arial, sans-serif;
      border-radius: 50%;
     cursor: pointer;
 }
+
+.range_digit{
+    width: 100px;
+    font-size: 30px;
+    text-align: center;
+    background: red;
+}

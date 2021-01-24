@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
+
 <head>
     <meta charset="UTF-8">
     <title>Стенд 5.5 кВт</title>
@@ -11,7 +12,12 @@
         font-size: 28px;
         font-family: 'Open Sans', verdana, arial, sans-serif;
         font-weight: bolder;
-    ">ИСПЫТАТЕЛЬНЫЙ СТЕНД 5.5 кВт</p>
+    ">ИСПЫТАТЕЛЬНЫЙ СТЕНД</p>
+    <p style = "
+        text-align: center;
+        color: #69808B;
+        font-family: 'Open Sans', verdana, arial, sans-serif;
+    "id="Server_IP">{{my_ip}}</p>
 </head>
 
 <div style="display: none;">
@@ -194,18 +200,25 @@
                                        onchange="
                         var val = document.getElementsByName('MPCH_hreg5')[0].value;
                         if(val==null) return;
-                        tmp = Number(val*this.value/1000).toFixed(0);
+                        tmp = this.value;
                         sendCommand('MPCH_Set_OneHolding',3, tmp);
                         sendCommand('MPCH_Get_OneHolding',3, 0);
-                        set_value_by_id('MPCH_FRI', (tmp*0.1).toFixed(1), 'red');
+                        ind = document.getElementById('MPCH_FRI');
+                        ind.value = (Number(this.value)*0.1).toFixed(1) ;
+                        ind.style.background = 'red'
                 "
                                        oninput="
-                        var val = document.getElementsByName('MPCH_hreg5')[0].value;
-                        if(val==null) return;
-                        tmp = Number(val*this.value*0.001);
-                        set_value_by_id('MPCH_FRI', (tmp*0.1).toFixed(1), 'blue');
+                        document.getElementById('MPCH_FRI').value = (Number(this.value)*0.1).toFixed(1) ;
                 "
-                 ></td><td align="center" ><span id="MPCH_FRI">0</span> Гц</td>
+                 ></td><td align="center" style = "font-size: 30px;" ><input id="MPCH_FRI" type = "number"
+                        class = "range_digit"
+                        onchange="
+                        sendCommand('MPCH_Set_OneHolding',3, (Number(this.value)*10).toFixed(0) );
+                        sendCommand('MPCH_Get_OneHolding',3, 0);
+                        rng = document.getElementById('MPCH_FreqCntrl');
+                        rng.value = (Number(this.value)*10).toFixed(0);
+                        "
+             >  Гц</td>
              </tr>
              <tr> <!--    Регулятор  направления МПЧ       -->
                 <td colspan="3"><p style = "font-size: 18px;" >Направление вращения</p></td></tr>
@@ -426,29 +439,64 @@
                 <!--    Регулятор момента в ген. режиме       -->
                 <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в генераторном режиме</p></td></tr>
                 <tr>
-                    <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="2500"  value="0" step="1" id = Schn_GenTrqRng
-                               onchange="sendCommand('Schn_setGenTorq', 0, this.value);  set_value_by_id('SchnI4', (this.value/10).toString(), 'red');"
-                               oninput=" set_value_by_id('SchnI4', (this.value/10).toString(), 'blue'); "
+                    <td colspan="2"><input type="range"  aling="center" class="slider" min="0" max="2500"  value="0" step="1" id = Schn_GenTrqRng
+                               onchange="
+                               sendCommand('Schn_setGenTorq', 0, this.value);
+                               ind = document.getElementById('SchnI4');
+                               ind.value = (Number(this.value)*0.1).toFixed(1) ;
+                               ind.style.background = 'red'
+                               "
+                               oninput=" document.getElementById('SchnI4').value = (Number(this.value)*0.1).toFixed(1);"
                     ></td>
-                     <td align="center" ><span id="SchnI4">0</span> %</td>
+                     <td align="center" ><input type="number" class = "range_digit" id="SchnI4" value = '0'
+                                                  onchange="
+                             rng = document.getElementById('Schn_GenTrqRng');
+                             if(rng.max < this.value*10) this.value = rng.max*0.1;
+                             sendCommand('Schn_setGenTorq', 0, this.value*10);
+                             rng.value = (Number(this.value)*10).toFixed(1);"
+
+                     > %</td>
                 </tr>
                 <!--    Регулятор момента в мотор. режиме       -->
                 <tr><td colspan="3"><p style = "font-size: 18px;" >Момент в двигательном режиме</p></td></tr>
                 <tr>
                     <td colspan="2"><input type="range" aling="center" class="slider" min="0" max="2500"  value="0" step="1" id = Schn_MtrTrqRng
-                               onchange="sendCommand('Schn_setMtrTorq', 0, this.value); set_value_by_id('SchnI5', (this.value/10).toString(), 'red');"
-                               oninput=" set_value_by_id('SchnI5', (this.value/10).toString(), 'blue'); "
+                                           onchange="
+                               sendCommand('Schn_setMtrTorq', 0, this.value);
+                               ind = document.getElementById('SchnI5');
+                               ind.value = (Number(this.value)*0.1).toFixed(1) ;
+                               ind.style.background = 'red'
+                               "
+                                           oninput=" document.getElementById('SchnI5').value = (Number(this.value)*0.1).toFixed(1);"
                     ></td>
-                     <td align="center" ><span id="SchnI5">0</span> %</td>
+                     <td align="center" ><input type="number" class = "range_digit"  id="SchnI5" value = '0'
+                             onchange="
+                             rng = document.getElementById('Schn_MtrTrqRng');
+                             if(rng.max < this.value*10) this.value = rng.max*0.1;
+                             sendCommand('Schn_setMtrTorq', 0, this.value*10);
+                             rng.value = (Number(this.value)*10).toFixed(1);"
+
+                     > %</td>
                 </tr>
                 <!--    Регулятор частоты       -->
                  <tr><td colspan="3"><p style = "font-size: 18px;" >Частота</p></td></tr>
                 <tr>
                     <td colspan="2"><input type="range" aling="center" class="slider" min="-500" max="500"  value="0" step="1" id = Schn_FreqRng
-                               onchange="sendCommand('Schn_setFreq', 0, this.value); set_value_by_id('SchnI3', (this.value/10).toString(), 'red');"
-                               oninput=" set_value_by_id('SchnI3', (this.value/10).toString(), 'blue'); "
+                                onchange="
+                               sendCommand('Schn_setFreq', 0, this.value);
+                               ind = document.getElementById('SchnI3');
+                               ind.value = (Number(this.value)*0.1).toFixed(1) ;
+                               ind.style.background = 'red'
+                               "
+                               oninput=" document.getElementById('SchnI3').value = (Number(this.value)*0.1).toFixed(1);"
                     ></td>
-                    <td align="center" ><span id="SchnI3" style="width = 10px; ">0</span> Гц</td>
+                    <td align="center" ><input type="number" class = "range_digit"  id="SchnI3" value='0'
+                             onchange="
+                             rng = document.getElementById('Schn_FreqRng');
+                             if(rng.max < this.value*10) this.value = rng.max*0.1;
+                             sendCommand('Schn_setFreq', 0, this.value*10);
+                             rng.value = (Number(this.value)*10).toFixed(1);"
+                    > Гц</td>
                 </tr>
             </table>
         </div>
@@ -520,7 +568,6 @@
 </body>
 <footer>
 <!--    <p>powered by SergeyTyagus</p>-->
-    <span id="Server_IP">{{my_ip}}</span>
     <script src='{{static_url("scripts/index.js")}}'></script>
 </footer>
 </html>

@@ -65,7 +65,7 @@ socket.onmessage = function (message) {
                 tmp = document.getElementById(key);
                 if(tmp.style.background == "blue") continue;
                 if(tmp.style.background == "red"){
-                if(Number(tmp.innerHTML) == dict[key].value){tmp.style.background = "green";}else{}
+                if(Number(tmp.value) == dict[key].value){tmp.style.background = "green";}else{}
                 continue;
             }
 
@@ -108,17 +108,19 @@ socket.onmessage = function (message) {
 
         if(key == "MPCH_hreg3"){
                 tmp = document.getElementById('MPCH_FRI');
-                if(tmp.style.background == "blue" | tmp.style.background == "green" ) continue;
+                if(tmp.style.background == "blue" ) continue;
                 if(tmp.style.background == "red"){
-                    if(Number(tmp.innerHTML*10) == dict[key].value){tmp.style.background = "green";}
+                    if( Number(tmp.value*10) == dict[key].value ){tmp.style.background = "green";};
                     continue;
                 }
-                tmp.innerHTML = (dict[key].value * 0.1).toFixed(1)
+                tmp.value = (dict[key].value * 0.1).toFixed(1)
+                document.getElementById('MPCH_FreqCntrl').value = dict[key].value;
+
         }
 
         if(key == "MPCH_hreg4"){
             tmp = document.getElementById('MPCH_FDI');
-            if(tmp.style.background == "blue" | tmp.style.background == "green" ) continue;
+            if(tmp.style.background == "blue" ) continue;
             if(tmp.style.background == "red"){
                     if(tmp.innerHTML == "Прямое" & dict[key].value==0){tmp.style.background = "green";}
                     if(tmp.innerHTML == "Обратное" & dict[key].value==1){tmp.style.background = "green";}
